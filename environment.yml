@@ -2,7 +2,7 @@
 #   mamba remove --name ConceptualDesign --all
 #   mamba env create --name ConceptualDesign --file environment.yml
 
-name: DrumFlow
+name: ConceptualDesign
 
 channels:
   - conda-forge
