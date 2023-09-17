@@ -1,0 +1,34 @@
+# This file may be used to create a Python/conda environment using conda itself or mamba (faster):
+#   mamba remove --name ConceptualDesign --all
+#   mamba env create --name ConceptualDesign --file environment.yml
+
+name: DrumFlow
+
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python==3.10
+  - jupyter
+  - matplotlib
+  - numpy
+  - scipy
+  - sympy
+  - numpy-stl
+  - trimesh
+  - networkx # needed by trimesh but dependency not set
+  - pyglet   # needed by trimesh but dependency not set
+  - lxml   # needed by trimesh but dependency not set
+  - rtree   # needed by trimesh but dependency not set
+  - pyvista
+  # - sympy_plot_backends[all]
+
+
+
+## Add environment variables to this conda env:
+# conda env config vars set PYTHONPATH="${HOME}/miniconda3/envs/DrumFlow/lib/python3.11/site-packages:${HOME}/Teaching/ConceptualDesign/Packages"
+
+## List them using:
+# conda env config vars list
+
