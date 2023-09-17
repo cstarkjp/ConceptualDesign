@@ -254,10 +254,11 @@ class GraphingBase:
     def plot_model_3d(
             self,
             pvmesh: PVMesh,
-            do_show_edges: bool = True,
-            do_lighting: bool = False,
+            do_show_edges: Optional[bool] = True,
+            do_lighting: Optional[bool] = False,
+            backend: str = "trame"
         ) -> PVPlotter:
-        p = pv.Plotter()
+        p = pv.Plotter(notebook="true",)
         _ = p.add_mesh(
             pvmesh,
             scalars="colors",
@@ -273,5 +274,5 @@ class GraphingBase:
         cell_labels = [f'{i}' for i in range(pvmesh.n_cells)]
         p.add_point_labels(pvmesh.cell_centers(), cell_labels, font_size=10)
         p.camera_position = "xy"
-        p.show(jupyter_backend="trame")
+        p.show(jupyter_backend=backend)
         return p
