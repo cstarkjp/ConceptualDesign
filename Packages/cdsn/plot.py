@@ -257,8 +257,8 @@ class GraphingBase:
             do_show_edges: bool = True,
             do_lighting: bool = False,
         ) -> PVPlotter:
-        plotter = pv.Plotter()
-        _ = plotter.add_mesh(
+        p = pv.Plotter()
+        _ = p.add_mesh(
             pvmesh,
             scalars="colors",
             lighting=do_lighting,
@@ -266,6 +266,12 @@ class GraphingBase:
             show_edges=do_show_edges,
             preference="cell",
         )
-        plotter.camera_position = "xy"
-        plotter.show(jupyter_backend="trame")
-        return plotter
+        # points = pvmesh.points
+        # mask = points[:, 0] == 0
+        # p.add_point_labels(points[mask], points[mask].tolist(), point_size=20, font_size=36)
+        # p.add_point_scalar_labels(pvmesh, "colors", point_size=20, font_size=36)
+        cell_labels = [f'{i}' for i in range(pvmesh.n_cells)]
+        p.add_point_labels(pvmesh.cell_centers(), cell_labels, font_size=10)
+        p.camera_position = "xy"
+        p.show(jupyter_backend="trame")
+        return p
