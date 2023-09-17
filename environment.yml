@@ -14,8 +14,8 @@ dependencies:
   - matplotlib
   - numpy
   - scipy
-  - sympy
-  - numpy-stl
+  # - sympy
+  # - numpy-stl
   - trimesh
   - networkx # needed by trimesh but dependency not set
   - pyglet   # needed by trimesh but dependency not set
