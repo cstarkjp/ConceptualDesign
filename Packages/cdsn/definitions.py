@@ -7,7 +7,6 @@ Various type definitions, enumerations, etc.
 import warnings
 
 # import logging
-from typing import List, Tuple, Dict, Optional, Callable, TypeAlias, Union, TypeAlias
 from numpy.typing import NDArray
 import numpy as np
 from enum import Enum
@@ -23,8 +22,4 @@ from networkx import Graph as NXGraph
 
 warnings.filterwarnings("ignore")
 
-__all__ = ["LineIdx"]
-
-# TriMesh: TypeAlias = tm.TrackedArray
-# PVMesh: TypeAlias = NDArray
 

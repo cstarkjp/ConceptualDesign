@@ -1,10 +1,11 @@
 """
-Provide XXX class.
+Class to build a model geometry.
 
 ---------------------------------------------------------------------
 
 Requires Python packages/modules:
-  -  :mod:`xxx`
+  -  :mod:`trimesh`
+  -  :mod:`networkx`
 
 ---------------------------------------------------------------------
 """
@@ -21,7 +22,7 @@ import trimesh
 import networkx as nx
 
 from cdsn.definitions import (
-    NDArray, Trimesh, TrimeshTrackedArray, STLMesh, NXGraph
+    NDArray, Trimesh, TrimeshTrackedArray, NXGraph
 )
 
 warnings.filterwarnings("ignore")
