@@ -4,6 +4,7 @@ Provide a data visualization class.
 ---------------------------------------------------------------------
 
 Requires Python packages/modules:
+  -  :mod:`pyvista`
   -  :mod:`matplotlib`
 
 ---------------------------------------------------------------------
@@ -182,61 +183,6 @@ class GraphingBase:
         fig.set_dpi(dpi_)
         return fig
 
-    def get_aspect(self, axes: plt.Axes) -> float:
-        """
-        Get aspect ratio of graph.
-
-        Args:
-            axes:
-                the `axes` object of the figure
-
-        Returns:
-            float:
-                aspect ratio
-        """
-        # Total figure size
-        figWH: Tuple[float, float] = axes.get_figure().get_size_inches()
-        figW, figH = figWH
-        # Axis size on figure
-        bounds: Tuple[float, float, float, float] = axes.get_position().bounds
-        _, _, w, h = bounds
-        # Ratio of display units
-        disp_ratio: float = (figH * h) / (figW * w)
-        # Ratio of data units
-        # Negative over negative because of the order of subtraction
-        # logging.info(axes.get_ylim(),axes.get_xlim())
-        data_ratio: float = op.sub(*axes.get_ylim()) / op.sub(*axes.get_xlim())
-        aspect_ratio: float = disp_ratio / data_ratio
-        return aspect_ratio
-
-    def naturalize(self, fig: plt.Figure) -> None:
-        """Adjust graph aspect ratio into 'natural' ratio."""
-        axes: plt.Axes = fig.gca()
-        # x_lim, y_lim = axes.get_xlim(), axes.get_ylim()
-        # axes.set_aspect((y_lim[1]-y_lim[0])/(x_lim[1]-x_lim[0]))
-        axes.set_aspect(1 / self.get_aspect(axes))
-
-    def stretch(
-        self,
-        fig: plt.Figure,
-        xs: Optional[Tuple[float, float]] = None,
-        ys: Optional[Tuple[float, float]] = None,
-    ) -> None:
-        """Stretch graph axes by respective factors."""
-        axes: plt.Axes = fig.gca()
-        if xs is not None:
-            x_lim = axes.get_xlim()
-            x_range = x_lim[1] - x_lim[0]
-            axes.set_xlim(
-                x_lim[0] - x_range * xs[0], x_lim[1] + x_range * xs[1]
-            )
-        if ys is not None:
-            y_lim = axes.get_ylim()
-            y_range = y_lim[1] - y_lim[0]
-            axes.set_ylim(
-                y_lim[0] - y_range * ys[0], y_lim[1] + y_range * ys[1]
-            )
-
     def plot_raw_model(self, mg: ModelGeometry,) -> None:
         fig = self.create_figure(fig_name=f"mesh", fig_size=(8,8,),)
         m = mg.mesh
@@ -257,32 +203,26 @@ class GraphingBase:
             self, 
             name: str,
             mg: ModelGeometry,
-            cluster = None,
+            community: np.lib.index_tricks.IndexExpression = None,
             fig_size: Optional[Tuple[float, float]] = None,
             dpi: Optional[int] = None,
         ) -> None:
         r"""
-        Plot planform geometry of meander centerline.
+        Plot model geometry in 2D.
 
         Arguments:
-            name: 
-                reference for figure dictionary
-            river:
-                :class:`fme.frenet.kinoshita.Kinoshita` object
-            fig_size: (optional) 
-                x,y dimensions of figure
+            name: reference for figure dictionary
+            mg: model geometry
+            community: numpy slice of subset of clique communities to plot
+            fig_size: (optional) x,y dimensions of figure
             dpi: (optional) plot resolution
-            title: (optional)
-                not generally used
-            legend_font_size: (optional)
-                not generally used
         """
         # _ = self.create_figure(name, fig_size=fig_size, dpi=dpi)
         fig = self.create_figure(fig_name=f"{name}_mesh", fig_size=fig_size, dpi=dpi)
         mesh_vertices = mg.vertices
         communities_triangles = \
-            mg.communities_triangles if cluster is None \
-            else np.array(mg.communities_triangles, dtype=np.object_,)[cluster]
+            mg.communities_triangles if community is None \
+            else np.array(mg.communities_triangles, dtype=np.object_,)[community]
         for keynode_ in mg.keynodes:
             plt.plot(*mg.vertices[keynode_][0:2], "o", color="gray",)
         for ckey_, community_triangles_ in communities_triangles.items():
