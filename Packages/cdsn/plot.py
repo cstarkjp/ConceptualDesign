@@ -19,19 +19,20 @@ import numpy as np
 
 import pyvista as pv
 
-from cdsn.definitions import (
-    NDArray, Trimesh, TrimeshTrackedArray, STLMesh, NXGraph, 
-    PVMesh, PVPlotter,
-)
-from cdsn.model import Geometry as ModelGeometry
-
-# import locale
-
 # MatPlotLib
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.font_manager
 from matplotlib.colors import to_rgb
+
+from cdsn.definitions import (
+    NDArray, Trimesh, TrimeshTrackedArray, STLMesh, NXGraph, 
+    PVMesh, PVPlotter,
+)
+from cdsn.graph import Graph
+from cdsn.communities import Communities
+from cdsn.geometry import Geometry
+
 
 warnings.filterwarnings("ignore")
 
@@ -183,7 +184,7 @@ class GraphingBase:
         fig.set_dpi(dpi_)
         return fig
 
-    # def plot_raw_model(self, mg: ModelGeometry,) -> None:
+    # def plot_raw_model(self, mg: Geometry,) -> None:
     #     fig = self.create_figure(fig_name=f"mesh", fig_size=(8,8,),)
     #     m = mg.mesh
     #     tm = mg.trimesh
@@ -202,7 +203,9 @@ class GraphingBase:
     def plot_model(
             self, 
             name: str,
-            mg: ModelGeometry,
+            graph: Graph,
+            communities: Communities,
+            geometry: Geometry,
             community: Optional[Any] = None, #np.lib.index_tricks.IndexExpression]
             fig_size: Optional[Tuple[float, float]] = None,
             dpi: Optional[int] = None,
@@ -219,14 +222,14 @@ class GraphingBase:
         """
         # _ = self.create_figure(name, fig_size=fig_size, dpi=dpi)
         fig = self.create_figure(fig_name=f"{name}_mesh", fig_size=fig_size, dpi=dpi)
-        d_node_vertices = mg.d_node_vertices
+        d_node_vertices = graph.d_node_vertices
         communities_triangles = \
-            mg.d_community_triangles if community is None \
-            else np.array(mg.d_community_triangles, dtype=np.object_,)[community]
-        for keynode_ in mg.d_keynode_communities:
+            communities.d_community_triangles if community is None \
+            else np.array(communities.d_community_triangles, dtype=np.object_,)[community]
+        for keynode_ in geometry.d_keynode_communities:
             plt.plot(*d_node_vertices[keynode_][0:2], "o", color="gray",)
         for ckey_, community_triangles_ in communities_triangles.items():
-            c_ = "k" if ckey_== mg.groundcommunity else color(ckey_) 
+            c_ = "k" if ckey_== geometry.groundcommunity else color(ckey_) 
             for triangle_ in community_triangles_:
                 triangle_vertices_ = np.array([
                     d_node_vertices[node_][0:2]
@@ -239,17 +242,22 @@ class GraphingBase:
         gca.set_aspect(1)
         plt.grid(":", alpha=0.3)
 
-    def build_mesh(self, mg: ModelGeometry) -> PVMesh:
+    def build_mesh(
+            self, 
+            graph: Graph,
+            communities: Communities,
+            geometry: Geometry,
+        ) -> PVMesh:
         faces = (
-            [[3]+list(nodes_) for nodes_ in mg.d_triangle_trinodes.values()]
+            [[3]+list(nodes_) for nodes_ in graph.d_triangle_trinodes.values()]
         )
-        pvmesh: PVMesh = pv.PolyData(mg.vertices, faces)
-        pvmesh.cell_data["colors"] = np.zeros([mg.n_triangles,3])
-        for face_, triangles_nodes_ in mg.d_community_triangles.items():
+        pvmesh: PVMesh = pv.PolyData(graph.vertices, faces)
+        pvmesh.cell_data["colors"] = np.zeros([graph.n_triangles,3])
+        for face_, triangles_nodes_ in communities.d_community_triangles.items():
             for triangle_nodes_ in triangles_nodes_:
-                triangle_ = mg.d_trinodes_triangles[triangle_nodes_]
+                triangle_ = graph.d_trinodes_triangles[triangle_nodes_]
                 pvmesh.cell_data["colors"][triangle_] = (
-                    to_rgb("#d0d0d0") if face_== mg.groundcommunity else
+                    to_rgb("#d0d0d0") if face_== geometry.groundcommunity else
                     to_rgb(color(face_))
                 )
         return pvmesh
