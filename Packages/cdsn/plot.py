@@ -183,27 +183,27 @@ class GraphingBase:
         fig.set_dpi(dpi_)
         return fig
 
-    def plot_raw_model(self, mg: ModelGeometry,) -> None:
-        fig = self.create_figure(fig_name=f"mesh", fig_size=(8,8,),)
-        m = mg.mesh
-        tm = mg.trimesh
-        for i_, (triangle_, v0_, v1_, v2_,) in enumerate(zip(
-                m.vectors, m.v0[:,0:2], m.v1[:,0:2], m.v2[:,0:2],
-            )):
-            looptri_ = np.vstack([triangle_[:,0:2],triangle_[0,0:2]]).T
-            plt.fill(*looptri_, "-", c=color(i_), lw=1, alpha=0.3,)
-            plt.plot(*looptri_, "-", c=color(i_), lw=1, alpha=1,)
-        for i_, v_ in enumerate(tm.vertices[:,0:2]):
-            plt.plot(*v_,"ok", ms=2,)
-        gca = fig.gca()
-        gca.set_aspect(1)
-        plt.grid(":", alpha=0.3)
+    # def plot_raw_model(self, mg: ModelGeometry,) -> None:
+    #     fig = self.create_figure(fig_name=f"mesh", fig_size=(8,8,),)
+    #     m = mg.mesh
+    #     tm = mg.trimesh
+    #     for i_, (triangle_, v0_, v1_, v2_,) in enumerate(zip(
+    #             m.vectors, m.v0[:,0:2], m.v1[:,0:2], m.v2[:,0:2],
+    #         )):
+    #         looptri_ = np.vstack([triangle_[:,0:2],triangle_[0,0:2]]).T
+    #         plt.fill(*looptri_, "-", c=color(i_), lw=1, alpha=0.3,)
+    #         plt.plot(*looptri_, "-", c=color(i_), lw=1, alpha=1,)
+    #     for i_, v_ in enumerate(tm.vertices[:,0:2]):
+    #         plt.plot(*v_,"ok", ms=2,)
+    #     gca = fig.gca()
+    #     gca.set_aspect(1)
+    #     plt.grid(":", alpha=0.3)
 
     def plot_model(
             self, 
             name: str,
             mg: ModelGeometry,
-            community: np.lib.index_tricks.IndexExpression = None,
+            community: Optional[Any] = None, #np.lib.index_tricks.IndexExpression]
             fig_size: Optional[Tuple[float, float]] = None,
             dpi: Optional[int] = None,
         ) -> None:
@@ -259,6 +259,7 @@ class GraphingBase:
             pvmesh: PVMesh,
             do_show_edges: Optional[bool] = True,
             do_lighting: Optional[bool] = False,
+            do_trilabels = False,
             backend: str = "trame"
         ) -> PVPlotter:
         p = pv.Plotter(notebook="true",)
@@ -275,7 +276,8 @@ class GraphingBase:
         # p.add_point_labels(points[mask], points[mask].tolist(), point_size=20, font_size=36)
         # p.add_point_scalar_labels(pvmesh, "colors", point_size=20, font_size=36)
         cell_labels = [f'{i}' for i in range(pvmesh.n_cells)]
-        p.add_point_labels(pvmesh.cell_centers(), cell_labels, font_size=10)
+        if do_trilabels:
+            p.add_point_labels(pvmesh.cell_centers(), cell_labels, font_size=10)
         p.camera_position = "xy"
         p.show(jupyter_backend=backend)
         return p

@@ -1,3 +1,26 @@
+              # self.triangle_areas: NDArray = np.array([
+        #     area(self.chop(np.array([
+        #         self.d_node_vertices[node_]
+        #         for node_ in triangle_
+        #     ])))
+        #     for triangle_ in self.d_triangle_trinodes.values()
+        # ])    
+
+  
+    # def build_keynodes_dict(self):
+    #     # This is not an efficient algorithm!
+    #     # Worse: it fails to count *all* the connected communities per keynode
+    #     for community_, nodes_ in self.d_community_nodes.items():
+    #         d_othercommunity_nodes: Dict = self.d_community_nodes.copy()
+    #         del d_othercommunity_nodes[community_]
+    #         # Now we have (1) a target community(2) the other communities
+    #         # Step through the other communities
+    #         for othercommunity_, othernodes_ in d_othercommunity_nodes.items():
+    #             # Search through all the nodes of the target community
+    #             for node_ in nodes_:
+    #                 if node_ in othernodes_:
+    #                     yield(node_, (community_,othercommunity_))
+
 
 from operator import add
 
@@ -5,8 +28,8 @@ from operator import add
 from functools import reduce
 import pyvista as pv
 from stl import mesh
-        # self.mesh = mesh.Mesh.from_file(self.file_name)
-        # reader = pv.get_reader(self.file_name)
+        # self.mesh = mesh.Mesh.from_file(self.file_path_name)
+        # reader = pv.get_reader(self.file_path_name)
         # self.pvmesh = reader.read()
 
 plotter = pv.Plotter()
@@ -33,7 +56,7 @@ plotter.show(jupyter_backend="trame")
 # pv.set_jupyter_backend("trame")
 
 # # cpos = [(-0.08566, 0.18735, 0.20116), (-0.05332, 0.12168, -0.01215), (-0.00151, 0.95566, -0.29446)]
-# reader = pv.get_reader(mg.file_name)
+# reader = pv.get_reader(mg.file_path_name)
 # pvmesh = reader.read()
 # # mesh.plot()
 # pl = pv.Plotter()

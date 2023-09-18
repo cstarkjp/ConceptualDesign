@@ -26,5 +26,5 @@ def conv(expr, units, n):
     """
     Change units in SymPy equation with numerical RHS and round the value.
     """
-    conv_x = int if n<=0 else lambda x: x
+    conv_x = lambda x: int(x) if n<=0 else lambda x: x
     return Eq(expr.lhs, conv_x((convert_to(expr.rhs,units)/units).round(n))*units)

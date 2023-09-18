@@ -34,15 +34,27 @@ area = lambda v: np.abs(np.dot((v[1]-v[0]),(v[1]-v[0])))
 
 
 class Geometry:
+    """
+    Class to build mesh geometry and analyze it.
+
+    Args:
+        name (str):
+            name of source geometry STL file (stem only)
+        data_path (optional str):
+            relative path from here to data STL files (assumed to be ../Data/STL/)
+
+    Attributes:
+        file_path_name (str): 
+            relative path to STL file and its name with ".stl" extension
+    """
     def __init__(
             self,
-            case_name: str,
-            data_path: str = os.path.join(os.pardir,"Data","STL",),
-            dist_max: float = 1e-3,
+            name: str,
+            data_path: Optional[str] = os.path.join(os.pardir,"Data","STL",),
         ):
         # Read model from STL file
-        self.name = case_name
-        self.read_from_stl(data_path, case_name, )
+        self.name = name
+        self.read_from_stl(data_path, name, )
 
         # Use networkx to build a graph from the model edges
         self.build_graph()
@@ -56,8 +68,9 @@ class Geometry:
         self.find_community_triangles()
         self.find_community_areas()
         self.find_groundcommunity()
-        self.find_keynodes_communities()
         self.split_into_ground_appliedforces_members()
+        self.find_keynodes_communities()
+        self.find_keynodes_members()
         self.find_keynodes_for_appliedforces()
 
     def chop(self, array: NDArray):
@@ -68,10 +81,10 @@ class Geometry:
     def read_from_stl(
             self,
             data_path: str,
-            case_name: str,
+            name: str,
         ):
-        self.file_name: str = os.path.join(data_path,f"{case_name}.stl")
-        self.trimesh: Trimesh = trimesh.load(self.file_name, process=True,)
+        self.file_path_name: str = os.path.join(data_path,f"{name}.stl")
+        self.trimesh: Trimesh = trimesh.load(self.file_path_name, process=True,)
 
     def build_graph(self):
         self.edges: NDArray = self.trimesh.edges_unique
@@ -126,8 +139,10 @@ class Geometry:
 
     def find_groundcommunity(self):
         # https://stackoverflow.com/questions/268272/getting-key-with-maximum-value-in-dictionary
+        # Using .__getitem__ instead of .get to make mypy happy:
+        # https://stackoverflow.com/questions/75365839/mypy-with-dictionarys-get-function
         self.groundcommunity: int \
-            = max(self.d_community_areas, key=self.d_community_areas.get)
+            = max(self.d_community_areas, key=self.d_community_areas.__getitem__)
 
     @staticmethod
     def find_triangles_in(
@@ -148,51 +163,77 @@ class Geometry:
             area(self.chop(self.vertices[np.r_[triangle_]]))            
             for triangle_ in self.d_triangle_trinodes.values()
         ])    
-        # self.triangle_areas: NDArray = np.array([
-        #     area(self.chop(np.array([
-        #         self.d_node_vertices[node_]
-        #         for node_ in triangle_
-        #     ])))
-        #     for triangle_ in self.d_triangle_trinodes.values()
-        # ])    
-
-    def find_keynodes_communities(self):
-        self.d_keynode_communities = dict(self.build_keynodes_dict())
-
-    def build_keynodes_dict(self):
-        for community_, nodes_ in self.d_community_nodes.items():
-            other_communities = self.d_community_nodes.copy()
-            del other_communities[community_]
-            for other_community_, other_nodes_ in other_communities.items():
-                for node_ in nodes_:
-                    if node_ in other_nodes_:
-                        yield(node_, (community_,other_community_))
 
     def split_into_ground_appliedforces_members(self):
-        self.groundcommunity_nodes = self.d_community_nodes[self.groundcommunity]
-        self.groundcommunity_triangles = self.d_community_triangles[self.groundcommunity]
-        self.groundcommunity_areas = self.d_community_areas[self.groundcommunity]
-        self.appliedforce_communities = [
+        self.groundcommunity_nodes: frozenset \
+            = self.d_community_nodes[self.groundcommunity]
+        self.groundcommunity_triangles: frozenset = \
+            self.d_community_triangles[self.groundcommunity]
+        self.groundcommunity_area: float = \
+            self.d_community_areas[self.groundcommunity]
+        self.appliedforce_communities: frozenset = frozenset([
             community_
             for community_,nodes_ in self.d_community_nodes.items()
             if len(nodes_)==3
-        ]
-        self.d_appliedforce_communities = {
+        ])
+        self.d_appliedforce_communities: Dict = {
             appliedforce_: community_ 
             for appliedforce_,community_ in enumerate(self.appliedforce_communities)
         }
-        self.d_appliedforce_trinodes = {
+        self.d_appliedforce_trinodes: Dict = {
             appliedforce_: self.d_community_nodes[community_] 
             for appliedforce_,community_ in self.d_appliedforce_communities.items()
         }
-        d_community_nodes_ = self.d_community_nodes.copy()
+        d_community_nodes_: Dict = self.d_community_nodes.copy()
         del d_community_nodes_[self.groundcommunity]
         for community_ in self.appliedforce_communities:
             del d_community_nodes_[community_]
-        self.d_member_nodes = {
+        self.d_member_nodes: Dict = {
             member_: nodes_ 
             for member_,(_,nodes_) in enumerate(d_community_nodes_.items())
         }
+        self.d_member_community: Dict = {
+            member_: community_ 
+            for member_,(community_,_) in enumerate(d_community_nodes_.items())
+        }
+        self.d_community_member: Dict = {
+            community_: member_  for member_,community_ in self.d_member_community.items()
+        }
+
+    def find_keynodes_communities(self):
+        d: Dict =  dict(self.build_keynodes_dict())
+        self.d_keynode_communities: Dict \
+            = dict(sorted(d.items(), key=lambda item: item[0]))
+
+    def find_keynodes_members(self):
+        self.d_keynode_members: Dict = {
+            keynode_: frozenset([
+                self.d_community_member[community_]
+                if community_ in self.d_community_member else (
+                    "force" if community_ in self.d_appliedforce_communities.values()
+                    else "ground"
+                )
+                for community_ in communities_
+            ])
+            for keynode_, communities_ in self.d_keynode_communities.items()
+        }
+
+    def build_keynodes_dict(self):
+        for community_, nodes_ in self.d_community_nodes.items():
+            d_othercommunity_nodes: Dict = self.d_community_nodes.copy()
+            del d_othercommunity_nodes[community_]
+            # Now we have (1) a target community (2) the other communities
+            # Search through all the nodes of the target community
+            for node_ in nodes_:
+                # Use set intersection to check if the target community
+                #   and the current other community share this node => keynode
+                connected_communities_: List = [community_] + [
+                    othercommunity_
+                    for othercommunity_, othernodes_ in d_othercommunity_nodes.items()
+                    if len(frozenset((node_,)).intersection(othernodes_))>0
+                ]
+                if len(connected_communities_)>1:
+                    yield(node_, frozenset(sorted(connected_communities_)))
 
     def find_keynodes_for_appliedforces(self):
         self.d_appliedforce_keynode = {
