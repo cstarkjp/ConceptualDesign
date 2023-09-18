@@ -152,16 +152,3 @@ class Communities:
             ])
             if n_shared_nodes==3:
                 yield(triangle_nodes_)
-
-    def compute_triangle_areas(self) -> None:
-        """
-        XXX
-
-        Attributes:
-            XXX (XXX):
-                XXX
-        """
-        self.triangle_areas: NDArray = np.array([
-            area(self.chop(self.vertices[np.r_[triangle_]]))            
-            for triangle_ in self.d_triangle_trinodes.values()
-        ])
