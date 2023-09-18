@@ -37,8 +37,8 @@ class Geometry:
     def __init__(
             self,
             case_name: str,
-            dist_max: float = 1e-3,
             data_path: str = os.path.join(os.pardir,"Data","STL",),
+            dist_max: float = 1e-3,
         ):
         # Read model from STL file
         self.name = case_name
@@ -55,8 +55,10 @@ class Geometry:
         self.find_community_nodes()
         self.find_community_triangles()
         self.find_community_areas()
-        self.find_ground_community()
+        self.find_groundcommunity()
         self.find_keynodes_communities()
+        self.split_into_ground_appliedforces_members()
+        self.find_keynodes_for_appliedforces()
 
     def chop(self, array: NDArray):
         chopped_array: NDArray = array.copy()
@@ -122,9 +124,9 @@ class Geometry:
             for key_,triangles_ in self.d_community_triangles.items()
         }
 
-    def find_ground_community(self):
+    def find_groundcommunity(self):
         # https://stackoverflow.com/questions/268272/getting-key-with-maximum-value-in-dictionary
-        self.ground_community: int \
+        self.groundcommunity: int \
             = max(self.d_community_areas, key=self.d_community_areas.get)
 
     @staticmethod
@@ -158,10 +160,46 @@ class Geometry:
         self.d_keynode_communities = dict(self.build_keynodes_dict())
 
     def build_keynodes_dict(self):
-        for community_id_, nodes_ in self.d_community_nodes.items():
+        for community_, nodes_ in self.d_community_nodes.items():
             other_communities = self.d_community_nodes.copy()
-            del other_communities[community_id_]
-            for other_community_id_, other_nodes_ in other_communities.items():
+            del other_communities[community_]
+            for other_community_, other_nodes_ in other_communities.items():
                 for node_ in nodes_:
                     if node_ in other_nodes_:
-                        yield(node_, (community_id_,other_community_id_))
+                        yield(node_, (community_,other_community_))
+
+    def split_into_ground_appliedforces_members(self):
+        self.groundcommunity_nodes = self.d_community_nodes[self.groundcommunity]
+        self.groundcommunity_triangles = self.d_community_triangles[self.groundcommunity]
+        self.groundcommunity_areas = self.d_community_areas[self.groundcommunity]
+        self.appliedforce_communities = [
+            community_
+            for community_,nodes_ in self.d_community_nodes.items()
+            if len(nodes_)==3
+        ]
+        self.d_appliedforce_communities = {
+            appliedforce_: community_ 
+            for appliedforce_,community_ in enumerate(self.appliedforce_communities)
+        }
+        self.d_appliedforce_trinodes = {
+            appliedforce_: self.d_community_nodes[community_] 
+            for appliedforce_,community_ in self.d_appliedforce_communities.items()
+        }
+        d_community_nodes_ = self.d_community_nodes.copy()
+        del d_community_nodes_[self.groundcommunity]
+        for community_ in self.appliedforce_communities:
+            del d_community_nodes_[community_]
+        self.d_member_nodes = {
+            member_: nodes_ 
+            for member_,(_,nodes_) in enumerate(d_community_nodes_.items())
+        }
+
+    def find_keynodes_for_appliedforces(self):
+        self.d_appliedforce_keynode = {
+            appliedforce_: [
+                keynode_
+                for keynode_, connected_communities_ in self.d_keynode_communities.items()
+                if community_ in connected_communities_
+            ][0]
+            for appliedforce_, community_ in self.d_appliedforce_communities.items()
+        }

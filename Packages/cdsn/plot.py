@@ -226,7 +226,7 @@ class GraphingBase:
         for keynode_ in mg.d_keynode_communities:
             plt.plot(*d_node_vertices[keynode_][0:2], "o", color="gray",)
         for ckey_, community_triangles_ in communities_triangles.items():
-            c_ = "k" if ckey_== mg.ground_community else color(ckey_) 
+            c_ = "k" if ckey_== mg.groundcommunity else color(ckey_) 
             for triangle_ in community_triangles_:
                 triangle_vertices_ = np.array([
                     d_node_vertices[node_][0:2]
@@ -249,7 +249,7 @@ class GraphingBase:
             for triangle_nodes_ in triangles_nodes_:
                 triangle_ = mg.d_trinodes_triangles[triangle_nodes_]
                 pvmesh.cell_data["colors"][triangle_] = (
-                    to_rgb("#d0d0d0") if face_== mg.ground_community else
+                    to_rgb("#d0d0d0") if face_== mg.groundcommunity else
                     to_rgb(color(face_))
                 )
         return pvmesh
