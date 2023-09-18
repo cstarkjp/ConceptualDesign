@@ -1,5 +1,5 @@
 """
-Class to build a model geometry.
+Class to convert mesh geometry into a networkx graph.
 
 ---------------------------------------------------------------------
 

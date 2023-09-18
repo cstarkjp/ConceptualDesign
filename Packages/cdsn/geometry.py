@@ -1,5 +1,5 @@
 """
-Class to build a model geometry.
+Class to partition the communities derived from a mesh-based graph into ground, members and applied forces.
 
 ---------------------------------------------------------------------
 

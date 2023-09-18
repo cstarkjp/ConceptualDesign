@@ -1,5 +1,5 @@
 """
-Class to build a model geometry.
+Class to build a mesh geometry from an STL file.
 
 ---------------------------------------------------------------------
 

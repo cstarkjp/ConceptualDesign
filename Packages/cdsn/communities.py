@@ -1,5 +1,5 @@
 """
-Class to build a model geometry.
+Class to partition a mesh-based graph into 3-clique communities.
 
 ---------------------------------------------------------------------
 
