@@ -3,7 +3,7 @@ Provide a data visualization class.
 
 ---------------------------------------------------------------------
 
-Requires Python packages/modules:
+Requires Python packages:
   -  :mod:`pyvista`
   -  :mod:`matplotlib`
 

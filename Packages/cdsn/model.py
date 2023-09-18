@@ -3,7 +3,7 @@ Class to build a model geometry.
 
 ---------------------------------------------------------------------
 
-Requires Python packages/modules:
+Requires Python packages:
   -  :mod:`trimesh`
   -  :mod:`networkx`
 
@@ -105,7 +105,7 @@ class Geometry:
             self,
             name: str,
             data_path: str = os.path.join(os.pardir,"Data","STL",),
-        ):
+        ) -> None:
         # Read model from STL file
         self.name = name
         self.read_from_stl(data_path, name, )
@@ -127,7 +127,7 @@ class Geometry:
         self.find_keynodes_members()
         self.find_keynodes_for_appliedforces()
 
-    def chop(self, array: NDArray):
+    def chop(self, array: NDArray) -> NDArray:
         """
         Chop tiny float values (close to tolerance) and set them to zero.
 
@@ -149,7 +149,7 @@ class Geometry:
             self,
             data_path: str,
             name: str,
-        ):
+        ) -> None:
         """
         Use Trimesh to load an STL file.
 
@@ -168,7 +168,7 @@ class Geometry:
         self.file_path_name: str = os.path.join(data_path,f"{name}.stl")
         self.trimesh: Trimesh = trimesh.load(self.file_path_name, process=True,)
 
-    def build_graph(self):
+    def build_graph(self) -> None:
         """
         XXX
 
@@ -182,7 +182,7 @@ class Geometry:
         for edge_, length_ in zip(self.edges, self.edge_lengths):
             self.graph.add_edge(*edge_, length=length_)
         
-    def find_vertices(self):
+    def find_vertices(self) -> None:
         """
         XXX
 
@@ -196,7 +196,7 @@ class Geometry:
             for key_,vertices_ in enumerate(self.trimesh.vertices)
         }
 
-    def find_triangles(self):
+    def find_triangles(self) -> None:
         """
         XXX
 
@@ -214,7 +214,7 @@ class Geometry:
         }
         self.n_triangles: int = max(self.d_triangle_trinodes)+1
     
-    def find_community_nodes(self):
+    def find_community_nodes(self) -> None:
         """
         XXX
 
@@ -230,7 +230,7 @@ class Geometry:
         }
         self.n_communities: int = max(self.d_community_nodes)+1
 
-    def find_community_triangles(self):
+    def find_community_triangles(self) -> None:
         """
         XXX
 
@@ -245,7 +245,7 @@ class Geometry:
             for key_,community_ in self.d_community_nodes.items()
         }
 
-    def find_community_areas(self):
+    def find_community_areas(self) -> None:
         """
         XXX
 
@@ -261,7 +261,7 @@ class Geometry:
             for key_,triangles_ in self.d_community_triangles.items()
         }
 
-    def find_groundcommunity(self):
+    def find_groundcommunity(self) -> None:
         """
         XXX
 
@@ -300,7 +300,7 @@ class Geometry:
             if n_shared_nodes==3:
                 yield(triangle_nodes_)
 
-    def compute_triangle_areas(self):
+    def compute_triangle_areas(self) -> None:
         """
         XXX
 
@@ -313,7 +313,7 @@ class Geometry:
             for triangle_ in self.d_triangle_trinodes.values()
         ])    
 
-    def split_into_ground_appliedforces_members(self):
+    def split_into_ground_appliedforces_members(self) -> None:
         """
         XXX
 
@@ -356,7 +356,7 @@ class Geometry:
             community_: member_  for member_,community_ in self.d_member_community.items()
         }
 
-    def find_keynodes_communities(self):
+    def find_keynodes_communities(self) -> None:
         """
         XXX
 
@@ -368,7 +368,7 @@ class Geometry:
         self.d_keynode_communities: Dict \
             = dict(sorted(d.items(), key=lambda item: item[0]))
 
-    def find_keynodes_members(self):
+    def find_keynodes_members(self) -> None:
         """
         XXX
 
@@ -388,7 +388,7 @@ class Geometry:
             for keynode_, communities_ in self.d_keynode_communities.items()
         }
 
-    def build_keynodes_dict(self):
+    def build_keynodes_dict(self) -> Iterable[Tuple[int, frozenset]]:
         """
         XXX
 
@@ -412,7 +412,7 @@ class Geometry:
                 if len(connected_communities_)>1:
                     yield(node_, frozenset(sorted(connected_communities_)))
 
-    def find_keynodes_for_appliedforces(self):
+    def find_keynodes_for_appliedforces(self) -> None:
         """
         XXX
 
