@@ -52,11 +52,11 @@ class Geometry:
         self.find_vertices()
         self.find_triangles()
         self.compute_triangle_areas()
-        self.find_communities()
-        self.find_communities_triangles()
-        self.find_communities_areas()
+        self.find_community_nodes()
+        self.find_community_triangles()
+        self.find_community_areas()
         self.find_ground_community()
-        self.find_keynodes()
+        self.find_keynodes_communities()
 
     def chop(self, array: NDArray):
         chopped_array: NDArray = array.copy()
@@ -80,48 +80,52 @@ class Geometry:
         
     def find_vertices(self):
         self.vertices: TrimeshTrackedArray[float,float,float] = self.trimesh.vertices
+        self.d_node_vertices: Dict[int,NDArray] = {
+            key_: np.array(vertices_)
+            for key_,vertices_ in enumerate(self.trimesh.vertices)
+        }
 
     def find_triangles(self):
         triangles_: Generator = nx.simple_cycles(self.graph, length_bound=3,)
-        self.triangles: Dict = {
+        self.d_triangle_trinodes: Dict = {
             key_: tuple(sorted(triangle_)) 
             for key_,triangle_ in enumerate(list(triangles_))
         }
-        self.triangles_by_nodes = {
-            nodes_: key_ for key_, nodes_ in self.triangles.items()
+        self.d_trinodes_triangles = {
+            nodes_: key_ for key_, nodes_ in self.d_triangle_trinodes.items()
         }
-        self.n_triangles: int = max(self.triangles)+1
+        self.n_triangles: int = max(self.d_triangle_trinodes)+1
     
-    def find_communities(self):
-        self.communities: Dict = {
+    def find_community_nodes(self):
+        self.d_community_nodes: Dict = {
             key_: community_ 
             for key_, community_ in enumerate(
                 nx.community.k_clique_communities(self.graph,3)
             )
         }
-        self.n_communities: int = max(self.communities)+1
+        self.n_communities: int = max(self.d_community_nodes)+1
 
-    def find_communities_triangles(self):
-        self.communities_triangles: Dict = {
+    def find_community_triangles(self):
+        self.d_community_triangles: Dict = {
             key_: frozenset(list(
-                self.find_triangles_in(self.triangles, community_,)
+                self.find_triangles_in(self.d_triangle_trinodes, community_,)
             ))
-            for key_,community_ in self.communities.items()
+            for key_,community_ in self.d_community_nodes.items()
         }
 
-    def find_communities_areas(self):
-        self.communities_areas: Dict = {
+    def find_community_areas(self):
+        self.d_community_areas: Dict = {
             key_: np.sum(np.array([
                 area(self.chop(self.vertices[np.r_[triangle_]]))            
                 for triangle_ in triangles_
             ]))
-            for key_,triangles_ in self.communities_triangles.items()
+            for key_,triangles_ in self.d_community_triangles.items()
         }
 
     def find_ground_community(self):
         # https://stackoverflow.com/questions/268272/getting-key-with-maximum-value-in-dictionary
         self.ground_community: int \
-            = max(self.communities_areas, key=self.communities_areas.get)
+            = max(self.d_community_areas, key=self.d_community_areas.get)
 
     @staticmethod
     def find_triangles_in(
@@ -140,15 +144,22 @@ class Geometry:
     def compute_triangle_areas(self):
         self.triangle_areas: NDArray = np.array([
             area(self.chop(self.vertices[np.r_[triangle_]]))            
-            for triangle_ in self.triangles.values()
+            for triangle_ in self.d_triangle_trinodes.values()
         ])    
+        # self.triangle_areas: NDArray = np.array([
+        #     area(self.chop(np.array([
+        #         self.d_node_vertices[node_]
+        #         for node_ in triangle_
+        #     ])))
+        #     for triangle_ in self.d_triangle_trinodes.values()
+        # ])    
 
-    def find_keynodes(self):
-        self.keynodes = dict(self.build_keynodes_dict())
+    def find_keynodes_communities(self):
+        self.d_keynode_communities = dict(self.build_keynodes_dict())
 
     def build_keynodes_dict(self):
-        for community_id_, nodes_ in self.communities.items():
-            other_communities = self.communities.copy()
+        for community_id_, nodes_ in self.d_community_nodes.items():
+            other_communities = self.d_community_nodes.copy()
             del other_communities[community_id_]
             for other_community_id_, other_nodes_ in other_communities.items():
                 for node_ in nodes_:

@@ -20,7 +20,7 @@ plotter.show(jupyter_backend="trame")
     #     self.sorted_triangle_indexes: NDArray = np.r_[list(np.flip(
     #         np.argsort(self.triangle_areas)
     #     ))]
-    #     self.sorted_triangles: NDArray = (np.array(self.triangles)[self.sorted_triangle_indexes])
+    #     self.sorted_triangles: NDArray = (np.array(self.d_triangle_trinodes)[self.sorted_triangle_indexes])
 
 
     # def find_ground_vertices(self):

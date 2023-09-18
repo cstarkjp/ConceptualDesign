@@ -219,16 +219,19 @@ class GraphingBase:
         """
         # _ = self.create_figure(name, fig_size=fig_size, dpi=dpi)
         fig = self.create_figure(fig_name=f"{name}_mesh", fig_size=fig_size, dpi=dpi)
-        mesh_vertices = mg.vertices
+        d_node_vertices = mg.d_node_vertices
         communities_triangles = \
-            mg.communities_triangles if community is None \
-            else np.array(mg.communities_triangles, dtype=np.object_,)[community]
-        for keynode_ in mg.keynodes:
-            plt.plot(*mg.vertices[keynode_][0:2], "o", color="gray",)
+            mg.d_community_triangles if community is None \
+            else np.array(mg.d_community_triangles, dtype=np.object_,)[community]
+        for keynode_ in mg.d_keynode_communities:
+            plt.plot(*d_node_vertices[keynode_][0:2], "o", color="gray",)
         for ckey_, community_triangles_ in communities_triangles.items():
             c_ = "k" if ckey_== mg.ground_community else color(ckey_) 
             for triangle_ in community_triangles_:
-                triangle_vertices_ = mesh_vertices[(loop(triangle_)),0:2]
+                triangle_vertices_ = np.array([
+                    d_node_vertices[node_][0:2]
+                    for node_ in (loop(triangle_))
+                ])
                 plt.plot(*(triangle_vertices_.T), "o", c=c_, ms=2,)
                 plt.fill(*(triangle_vertices_.T), "-", c=c_, alpha=0.3,)
                 plt.plot(*(triangle_vertices_.T), "-", c=c_, alpha=1, lw=0.5,)
@@ -238,13 +241,13 @@ class GraphingBase:
 
     def build_mesh(self, mg: ModelGeometry) -> PVMesh:
         faces = (
-            [[3]+list(nodes_) for nodes_ in mg.triangles.values()]
+            [[3]+list(nodes_) for nodes_ in mg.d_triangle_trinodes.values()]
         )
         pvmesh: PVMesh = pv.PolyData(mg.vertices, faces)
         pvmesh.cell_data["colors"] = np.zeros([mg.n_triangles,3])
-        for face_, triangles_nodes_ in mg.communities_triangles.items():
+        for face_, triangles_nodes_ in mg.d_community_triangles.items():
             for triangle_nodes_ in triangles_nodes_:
-                triangle_ = mg.triangles_by_nodes[triangle_nodes_]
+                triangle_ = mg.d_trinodes_triangles[triangle_nodes_]
                 pvmesh.cell_data["colors"][triangle_] = (
                     to_rgb("#d0d0d0") if face_== mg.ground_community else
                     to_rgb(color(face_))
