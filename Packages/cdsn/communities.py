@@ -58,28 +58,9 @@ class Communities:
             graph: Graph,
         ) -> None:
         self.graph = graph
-        self.tolerance = graph.tolerance
         self.find_community_nodes()
         self.find_community_triangles()
         self.find_community_areas()
-
-    def chop(self, array: NDArray) -> NDArray:
-        """
-        Chop tiny float values (close to tolerance) and set them to zero.
-
-        Tolerance is set during instantiation of the class.
-
-        Args:
-            array (NDArray[float,...]):
-                numpy array of whatever dimension
-
-        Returns:
-            array (NDArray[float,...]):
-                chopped (cleaned) numpy array
-        """
-        chopped_array: NDArray = array.copy()
-        chopped_array[np.isclose(array, 0, atol=self.tolerance)] = 0
-        return chopped_array
 
     def find_community_nodes(self) -> None:
         """
@@ -122,7 +103,7 @@ class Communities:
         """
         self.d_community_areas: Dict = {
             key_: np.sum(np.array([
-                area(self.chop(self.graph.vertices[np.r_[triangle_]]))            
+                area(self.graph.chop(self.graph.vertices[np.r_[triangle_]]))            
                 for triangle_ in triangles_
             ]))
             for key_,triangles_ in self.d_community_triangles.items()
