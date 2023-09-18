@@ -37,8 +37,6 @@ class Geometry:
     Args:
         communities (str):
             name of source geometry STL file (stem only)
-        data_path (optional str):
-            relative path from here to data STL files (assumed to be ../Data/STL/)
 
     Attributes:
         groundcommunity (int):
