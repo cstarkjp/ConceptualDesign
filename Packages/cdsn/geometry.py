@@ -1,5 +1,5 @@
 """
-Class to partition the communities derived from a mesh-based graph into ground, members and applied forces.
+Class to partition the communities derived from a mesh-based graph into ground, members and applied loads.
 
 ---------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ __all__ = ["Geometry"]
 
 class Geometry:
     """
-    Class to partition the communities derived from a mesh-based graph into ground, members and applied forces.
+    Class to partition the communities derived from a mesh-based graph into ground, members and applied loads.
 
     Args:
         communities (Community):
@@ -43,12 +43,12 @@ class Geometry:
             immutable set of all triangles in the ground community
         groundcommunity_area (float):
             total area of the ground community mesh
-        appliedforce_communities (frozenset[int]):
-            immutable set of communities that are actually applied forces
-        d_appliedforce_communities (dict):
-            applied-force-indexed dictionary of communities that are actually applied forces
-        d_appliedforce_trinodes (dict):
-            applied-force-indexed dictionary of triangles representing applied forces
+        appliedload_communities (frozenset[int]):
+            immutable set of communities that are actually applied loads
+        d_appliedload_communities (dict):
+            applied-force-indexed dictionary of communities that are actually applied loads
+        d_appliedload_trinodes (dict):
+            applied-force-indexed dictionary of triangles representing applied loads
         d_member_nodes (dict):
             member-indexed dictionary of nodes in each member
         d_member_community (dict):
@@ -63,10 +63,14 @@ class Geometry:
             dictionary listing keynodes (hub nodes linking distinct members) with the connected members
         d_member_keynodes (dict):
             dictionary listing members with all their keynodes
-        d_appliedforce_keynode (dict[int,frozenset[int/str]]):
-            dictionary listing applied forces with their connected keynodes
-        d_member_appliedforcekeynodes (dict):
-            dictionary listing members with all their applied force keynodes
+        d_appliedload_keynode (dict[int,int]):
+            dictionary listing applied loads with their connected keynodes
+        d_keynode_appliedload (dict[int,int]):
+            dictionary listing keynodes with their applied loads (reverse look-up)
+        d_member_appliedloads (dict):
+            dictionary listing members with all their applied loads
+        d_member_appliedloadkeynodes (dict):
+            dictionary listing members with all their applied load keynodes
     """
     def __init__(
             self,
@@ -74,12 +78,12 @@ class Geometry:
         ) -> None:
         self.cmnts = communities 
         self.find_groundcommunity() 
-        self.split_into_ground_appliedforces_members()
+        self.split_into_ground_appliedloads_members()
         self.find_keynodes_communities()
         self.find_keynodes_members()
         self.find_members_keynodes()
-        self.find_keynodes_for_appliedforces()
-        self.find_members_appliedforcekeynodes()
+        self.find_appliedloads_keynodes()
+        self.find_members_appliedloads()
 
     def find_groundcommunity(self) -> None:
         """
@@ -95,7 +99,7 @@ class Geometry:
         self.groundcommunity: int \
             = max(self.cmnts.d_community_areas, key=self.cmnts.d_community_areas.__getitem__)
 
-    def split_into_ground_appliedforces_members(self) -> None:
+    def split_into_ground_appliedloads_members(self) -> None:
         """
         XXX
 
@@ -109,22 +113,22 @@ class Geometry:
             self.cmnts.d_community_triangles[self.groundcommunity]
         self.groundcommunity_area: float = \
             self.cmnts.d_community_areas[self.groundcommunity]
-        self.appliedforce_communities: frozenset[int] = frozenset([
+        self.appliedload_communities: frozenset[int] = frozenset([
             community_
             for community_,nodes_ in self.cmnts.d_community_nodes.items()
             if len(nodes_)==3
         ])
-        self.d_appliedforce_communities: Dict = {
-            appliedforce_: community_ 
-            for appliedforce_,community_ in enumerate(self.appliedforce_communities)
+        self.d_appliedload_communities: Dict = {
+            appliedload_: community_ 
+            for appliedload_,community_ in enumerate(self.appliedload_communities)
         }
-        self.d_appliedforce_trinodes: Dict = {
-            appliedforce_: self.cmnts.d_community_nodes[community_] 
-            for appliedforce_,community_ in self.d_appliedforce_communities.items()
+        self.d_appliedload_trinodes: Dict = {
+            appliedload_: self.cmnts.d_community_nodes[community_] 
+            for appliedload_,community_ in self.d_appliedload_communities.items()
         }
         d_community_nodes_: Dict = self.cmnts.d_community_nodes.copy()
         del d_community_nodes_[self.groundcommunity]
-        for community_ in self.appliedforce_communities:
+        for community_ in self.appliedload_communities:
             del d_community_nodes_[community_]
         self.d_member_nodes: Dict = {
             member_: nodes_ 
@@ -163,7 +167,7 @@ class Geometry:
             keynode_: frozenset([
                 self.d_community_member[community_]
                 if community_ in self.d_community_member else (
-                    "force" if community_ in self.d_appliedforce_communities.values()
+                    "force" if community_ in self.d_appliedload_communities.values()
                     else "ground"
                 )
                 for community_ in communities_
@@ -210,7 +214,7 @@ class Geometry:
                 if len(connected_communities_)>1:
                     yield(node_, frozenset(sorted(connected_communities_)))
 
-    def find_keynodes_for_appliedforces(self) -> None:
+    def find_appliedloads_keynodes(self) -> None:
         """
         XXX
 
@@ -218,16 +222,20 @@ class Geometry:
             XXX (XXX):
                 XXX
         """
-        self.d_appliedforce_keynode: Dict = {
-            appliedforce_: [
+        self.d_appliedload_keynode: Dict = {
+            appliedload_: [
                 keynode_
                 for keynode_, connected_communities_ in self.d_keynode_communities.items()
                 if community_ in connected_communities_
             ][0]
-            for appliedforce_, community_ in self.d_appliedforce_communities.items()
+            for appliedload_, community_ in self.d_appliedload_communities.items()
+        }
+        self.d_keynode_appliedload: Dict = {
+            keynode_: appliedload_
+            for appliedload_,keynode_ in self.d_appliedload_keynode.items()
         }
 
-    def find_members_appliedforcekeynodes(self) -> None:
+    def find_members_appliedloads(self) -> None:
         """
         XXX
 
@@ -235,10 +243,17 @@ class Geometry:
             XXX (XXX):
                 XXX
         """
-        self.d_member_appliedforcekeynodes: Dict = {
+        self.d_member_appliedloadkeynodes: Dict = {
             member_: keynodes_.intersection(frozenset([
-                appliedforce_keynode_ 
-                for appliedforce_keynode_ in self.d_appliedforce_keynode.values()
+                appliedloadkeynode_ 
+                for appliedload_,appliedloadkeynode_ in self.d_appliedload_keynode.items()
             ]))
             for member_,keynodes_ in self.d_member_keynodes.items()
+        }
+        self.d_member_appliedloads: Dict = {
+            member_: frozenset([
+                self.d_keynode_appliedload[appliedloadkeynode_]
+                for appliedloadkeynode_ in appliedloadkeynodes_
+            ])
+            for member_,appliedloadkeynodes_ in self.d_member_appliedloadkeynodes.items()
         }
