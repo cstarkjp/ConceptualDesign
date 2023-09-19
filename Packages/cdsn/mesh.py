@@ -5,7 +5,6 @@ Class to build a mesh geometry from an STL file.
 
 Requires Python packages:
   -  :mod:`trimesh`
-  -  :mod:`networkx`
 
 ---------------------------------------------------------------------
 """
@@ -17,7 +16,6 @@ from typing import (
 )
 
 import os
-import numpy as np
 import trimesh
 
 from cdsn.definitions import (

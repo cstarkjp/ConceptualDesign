@@ -33,7 +33,6 @@ from cdsn.graph import Graph
 from cdsn.communities import Communities
 from cdsn.geometry import Geometry
 
-
 warnings.filterwarnings("ignore")
 
 __all__ = ["GraphingBase"]
@@ -184,22 +183,6 @@ class GraphingBase:
         fig.set_dpi(dpi_)
         return fig
 
-    # def plot_raw_model(self, mg: Geometry,) -> None:
-    #     fig = self.create_figure(fig_name=f"mesh", fig_size=(8,8,),)
-    #     m = mg.mesh
-    #     tm = mg.trimesh
-    #     for i_, (triangle_, v0_, v1_, v2_,) in enumerate(zip(
-    #             m.vectors, m.v0[:,0:2], m.v1[:,0:2], m.v2[:,0:2],
-    #         )):
-    #         looptri_ = np.vstack([triangle_[:,0:2],triangle_[0,0:2]]).T
-    #         plt.fill(*looptri_, "-", c=color(i_), lw=1, alpha=0.3,)
-    #         plt.plot(*looptri_, "-", c=color(i_), lw=1, alpha=1,)
-    #     for i_, v_ in enumerate(tm.vertices[:,0:2]):
-    #         plt.plot(*v_,"ok", ms=2,)
-    #     gca = fig.gca()
-    #     gca.set_aspect(1)
-    #     plt.grid(":", alpha=0.3)
-
     def plot_model(
             self, 
             name: str,
@@ -244,10 +227,10 @@ class GraphingBase:
 
     def build_mesh(
             self, 
-            graph: Graph,
-            communities: Communities,
             geometry: Geometry,
         ) -> PVMesh:
+        communities = geometry.cmnts
+        graph = communities.graph
         faces = (
             [[3]+list(nodes_) for nodes_ in graph.d_triangle_trinodes.values()]
         )

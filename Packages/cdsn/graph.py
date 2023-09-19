@@ -4,7 +4,6 @@ Class to convert mesh geometry into a networkx graph.
 ---------------------------------------------------------------------
 
 Requires Python packages:
-  -  :mod:`trimesh`
   -  :mod:`networkx`
 
 ---------------------------------------------------------------------
@@ -16,9 +15,7 @@ from typing import (
     Dict, Any, Tuple, Optional, List, Callable, Iterable, Sized, Generator,
 )
 
-import os
 import numpy as np
-import trimesh
 import networkx as nx
 
 from cdsn.definitions import (

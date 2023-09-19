@@ -4,7 +4,6 @@ Class to partition the communities derived from a mesh-based graph into ground, 
 ---------------------------------------------------------------------
 
 Requires Python packages:
-  -  :mod:`trimesh`
   -  :mod:`networkx`
 
 ---------------------------------------------------------------------
@@ -16,9 +15,6 @@ from typing import (
     Dict, Any, Tuple, Optional, List, Callable, Iterable, Sized, Generator,
 )
 
-import os
-import numpy as np
-import trimesh
 import networkx as nx
 
 from cdsn.definitions import (
@@ -35,7 +31,7 @@ class Geometry:
     Class to partition the communities derived from a mesh-based graph into ground, members and applied forces.
 
     Args:
-        communities (str):
+        communities (Community):
             name of source geometry STL file (stem only)
 
     Attributes:
