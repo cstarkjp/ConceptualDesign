@@ -36,13 +36,13 @@ from cdsn.geometry import Geometry
 
 warnings.filterwarnings("ignore")
 
-__all__ = ["GraphingBase"]
+__all__ = ["Visualization"]
 
 color_cycle = (plt.rcParams['axes.prop_cycle'].by_key()['color'])
 color = lambda i: color_cycle[i % len(color_cycle)]
 loop = lambda triangle: list(triangle) + [triangle[0]]
 
-class GraphingBase:
+class Visualization:
     """
     Provide a visualization base class.
 
