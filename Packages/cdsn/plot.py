@@ -249,9 +249,11 @@ class Visualization:
     def plot_model_3d(
             self,
             pvmesh: PVMesh,
+            geometry: Optional[Geometry] = None,
             do_show_edges: Optional[bool] = True,
             do_lighting: Optional[bool] = False,
-            do_trilabels = False,
+            do_triangle_labels = False,
+            do_appliedload_labels = False,
             backend: str = "trame"
         ) -> PVPlotter:
         p = pv.Plotter(notebook="true",)
@@ -267,8 +269,15 @@ class Visualization:
         # mask = points[:, 0] == 0
         # p.add_point_labels(points[mask], points[mask].tolist(), point_size=20, font_size=36)
         # p.add_point_scalar_labels(pvmesh, "colors", point_size=20, font_size=36)
-        cell_labels = [f'{i}' for i in range(pvmesh.n_cells)]
-        if do_trilabels:
+        if do_triangle_labels:
+            cell_labels = [f'{i}' for i in range(pvmesh.n_cells)]
+            p.add_point_labels(pvmesh.cell_centers(), cell_labels, font_size=10)
+        elif do_appliedload_labels and geometry is not None:
+            cell_labels = [
+                (f"{geometry.d_keynode_appliedload[i]}" if i in geometry.d_keynode_appliedload
+                else "")
+                for i in range(pvmesh.n_cells)
+            ]
             p.add_point_labels(pvmesh.cell_centers(), cell_labels, font_size=10)
         p.camera_position = "xy"
         p.show(jupyter_backend=backend)
