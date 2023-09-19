@@ -18,6 +18,7 @@ from typing import Dict, Any, Tuple, Optional, List, Callable, Iterable, Sized
 import numpy as np
 
 import pyvista as pv
+import networkx as nx
 
 # MatPlotLib
 import matplotlib as mpl
@@ -272,3 +273,22 @@ class GraphingBase:
         p.camera_position = "xy"
         p.show(jupyter_backend=backend)
         return p
+    
+    def plot_graph(
+            self,
+            name: str,
+            graph: Graph,
+            fig_size: Optional[Tuple[float, float]] = None,
+            dpi: Optional[int] = None,
+        ) -> None:
+        r"""
+        Plot graph of mesh.
+
+        Arguments:
+            name: reference for figure dictionary
+            graph: networkx graph of mesh
+            fig_size: (optional) x,y dimensions of figure
+            dpi: (optional) plot resolution
+        """
+        _ = self.create_figure(fig_name=f"{name}_graph", fig_size=fig_size, dpi=dpi)
+        nx.draw_kamada_kawai(graph.nxgraph, node_size=20,)
