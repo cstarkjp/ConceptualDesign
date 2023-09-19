@@ -52,15 +52,21 @@ class Geometry:
         d_member_nodes (dict):
             member-indexed dictionary of nodes in each member
         d_member_community (dict):
-            dictionary linking members to communities
+            dictionary listing members with communities
         d_community_member (dict):
-            dictionary linking communities to members (reverse look-up)
+            dictionary listing communities with members (reverse look-up)
+        keynodes (frozenset):
+            immutable set of all keynodes (hub nodes linking distinct members) 
         d_keynode_communities (dict):
-            dictionary linking keynodes (hub nodes linking distinct members) to the connected communities
+            dictionary listing keynodes (hub nodes linking distinct members) with the connected communities
         d_keynode_members (dict):
-            dictionary linking keynodes (hub nodes linking distinct members) to the connected members
+            dictionary listing keynodes (hub nodes linking distinct members) with the connected members
+        d_member_keynodes (dict):
+            dictionary listing members with all their keynodes
         d_appliedforce_keynode (dict[int,frozenset[int/str]]):
-            dictionary linking applied forces to their connected keynodes
+            dictionary listing applied forces with their connected keynodes
+        d_member_appliedforcekeynodes (dict):
+            dictionary listing members with all their applied force keynodes
     """
     def __init__(
             self,
@@ -71,7 +77,9 @@ class Geometry:
         self.split_into_ground_appliedforces_members()
         self.find_keynodes_communities()
         self.find_keynodes_members()
+        self.find_members_keynodes()
         self.find_keynodes_for_appliedforces()
+        self.find_members_appliedforcekeynodes()
 
     def find_groundcommunity(self) -> None:
         """
@@ -141,6 +149,7 @@ class Geometry:
         d: Dict =  dict(self.build_keynodes_dict())
         self.d_keynode_communities: Dict \
             = dict(sorted(d.items(), key=lambda item: item[0]))
+        self.keynodes = frozenset(self.d_keynode_communities)
 
     def find_keynodes_members(self) -> None:
         """
@@ -160,6 +169,21 @@ class Geometry:
                 for community_ in communities_
             ])
             for keynode_, communities_ in self.d_keynode_communities.items()
+        }
+
+    def find_members_keynodes(self) -> None:
+        """
+        XXX
+
+        Attributes:
+            XXX (XXX):
+                XXX
+        """
+        self.d_member_keynodes: Dict = {
+            member_: frozenset(
+                nodes_.intersection(self.keynodes)
+            )
+            for member_, nodes_ in self.d_member_nodes.items()
         }
 
     def build_keynodes_dict(self) -> Iterable[Tuple[int, frozenset]]:
@@ -201,4 +225,20 @@ class Geometry:
                 if community_ in connected_communities_
             ][0]
             for appliedforce_, community_ in self.d_appliedforce_communities.items()
+        }
+
+    def find_members_appliedforcekeynodes(self) -> None:
+        """
+        XXX
+
+        Attributes:
+            XXX (XXX):
+                XXX
+        """
+        self.d_member_appliedforcekeynodes: Dict = {
+            member_: keynodes_.intersection(frozenset([
+                appliedforce_keynode_ 
+                for appliedforce_keynode_ in self.d_appliedforce_keynode.values()
+            ]))
+            for member_,keynodes_ in self.d_member_keynodes.items()
         }
