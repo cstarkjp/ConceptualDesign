@@ -217,7 +217,7 @@ class Visualization:
             for triangle_ in community_triangles_:
                 triangle_vertices_ = np.array([
                     d_node_vertices[node_][0:2]
-                    for node_ in (loop(triangle_))
+                    for node_ in (loop(tuple(triangle_)))
                 ])
                 plt.plot(*(triangle_vertices_.T), "o", c=c_, ms=2,)
                 plt.fill(*(triangle_vertices_.T), "-", c=c_, alpha=0.3,)
