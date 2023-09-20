@@ -100,7 +100,7 @@ class Communities:
         """
         self.d_community_areas: Dict = {
             key_: np.sum(np.array([
-                area(self.graph.chop(self.graph.vertices[np.r_[triangle_]]))            
+                area(self.graph.chop(self.graph.vertices[np.r_[tuple(triangle_)]]))            
                 for triangle_ in triangles_
             ]))
             for key_,triangles_ in self.d_community_triangles.items()

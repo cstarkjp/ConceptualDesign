@@ -43,9 +43,9 @@ class Graph:
             x,y,z positions of graph nodes
         d_node_vertices (dict[int,NDArray[float,float,float]]):
             node-indexed dictionary of x,y,z vertices
-        d_triangle_trinodes (dict[int,tuple[int,int,int]]):
+        d_triangle_trinodes (dict[int,frozenset[int,int,int]]):
             triangle-indexed dictionary of triangle nodes
-        d_trinodes_triangles (dict[int,NDArray[float,float,float]]):
+        d_trinodes_triangles (dict[frozenset,int]):
             triangle-node-indexed dictionary of triangles (for reverse look-up)
         n_triangles (int):
             number of triangles in the mesh
@@ -119,7 +119,7 @@ class Graph:
         """
         triangles_: Generator = nx.simple_cycles(self.nxgraph, length_bound=3,)
         self.d_triangle_trinodes: Dict = {
-            key_: tuple(sorted(triangle_)) 
+            key_: frozenset(sorted(triangle_)) 
             for key_,triangle_ in enumerate(list(triangles_))
         }
         self.d_trinodes_triangles: Dict = {
@@ -136,6 +136,6 @@ class Graph:
                 XXX
         """
         self.triangle_areas: NDArray = np.array([
-            area(self.chop(self.vertices[np.r_[triangle_]]))            
+            area(self.chop(self.vertices[np.r_[tuple(triangle_)]]))            
             for triangle_ in self.d_triangle_trinodes.values()
         ])    
