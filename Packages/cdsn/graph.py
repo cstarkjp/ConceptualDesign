@@ -45,7 +45,7 @@ class Graph:
             node-indexed dictionary of x,y,z vertices
         d_triangle_trinodes (dict[int,frozenset[int,int,int]]):
             triangle-indexed dictionary of triangle nodes
-        d_trinodes_triangles (dict[frozenset,int]):
+        d_trinodes_triangle (dict[frozenset,int]):
             triangle-node-indexed dictionary of triangles (for reverse look-up)
         n_triangles (int):
             number of triangles in the mesh
@@ -122,7 +122,7 @@ class Graph:
             key_: frozenset(sorted(triangle_)) 
             for key_,triangle_ in enumerate(list(triangles_))
         }
-        self.d_trinodes_triangles: Dict = {
+        self.d_trinodes_triangle: Dict = {
             nodes_: key_ for key_, nodes_ in self.d_triangle_trinodes.items()
         }
         self.n_triangles: int = max(self.d_triangle_trinodes)+1

@@ -33,6 +33,7 @@ from cdsn.definitions import (
 from cdsn.graph import Graph
 from cdsn.communities import Communities
 from cdsn.geometry import Geometry
+from cdsn.forces import Forces
 
 warnings.filterwarnings("ignore")
 
@@ -230,7 +231,7 @@ class Visualization:
             self, 
             geometry: Geometry,
         ) -> PVMesh:
-        communities = geometry.cmnts
+        communities = geometry.communities
         graph = communities.graph
         faces = (
             [[3]+list(nodes_) for nodes_ in graph.d_triangle_trinodes.values()]
@@ -239,7 +240,7 @@ class Visualization:
         pvmesh.cell_data["colors"] = np.zeros([graph.n_triangles,3])
         for face_, triangles_nodes_ in communities.d_community_triangles.items():
             for triangle_nodes_ in triangles_nodes_:
-                triangle_ = graph.d_trinodes_triangles[triangle_nodes_]
+                triangle_ = graph.d_trinodes_triangle[triangle_nodes_]
                 pvmesh.cell_data["colors"][triangle_] = (
                     to_rgb("#d0d0d0") if face_== geometry.groundcommunity else
                     to_rgb(color(face_))
@@ -249,7 +250,8 @@ class Visualization:
     def plot_model_3d(
             self,
             pvmesh: PVMesh,
-            geometry: Optional[Geometry] = None,
+            geometry: Geometry,
+            forces: Forces,
             do_show_edges: Optional[bool] = True,
             do_lighting: Optional[bool] = False,
             do_triangle_labels = False,
@@ -265,6 +267,10 @@ class Visualization:
             show_edges=do_show_edges,
             preference="cell",
         )
+        graph = geometry.communities.graph
+        n_triangles = graph.n_triangles
+        assert pvmesh.n_cells==n_triangles
+        assert np.all(graph.vertices)==np.all(pvmesh.points)
         # points = pvmesh.points
         # mask = points[:, 0] == 0
         # p.add_point_labels(points[mask], points[mask].tolist(), point_size=20, font_size=36)
@@ -274,10 +280,13 @@ class Visualization:
             p.add_point_labels(pvmesh.cell_centers(), cell_labels, font_size=10)
         elif do_appliedload_labels and geometry is not None:
             cell_labels = [
-                (f"{geometry.d_keynode_appliedload[i]}" if i in geometry.d_keynode_appliedload
+                (f"{forces.d_triangle_appliedload[triangle_]}" 
+                if triangle_ in forces.d_triangle_appliedload
                 else "")
-                for i in range(pvmesh.n_cells)
+                for triangle_ in range(n_triangles)
             ]
+            # for triangle_ in range(n_triangles):
+            #     print(triangle_)
             p.add_point_labels(pvmesh.cell_centers(), cell_labels, font_size=10)
         p.camera_position = "xy"
         p.show(jupyter_backend=backend)

@@ -76,7 +76,7 @@ class Geometry:
             self,
             communities: Communities,
         ) -> None:
-        self.cmnts = communities 
+        self.communities = communities 
         self.find_groundcommunity() 
         self.split_into_ground_appliedloads_members()
         self.find_keynodes_communities()
@@ -97,7 +97,7 @@ class Geometry:
         # Using .__getitem__ instead of .get to make mypy happy:
         # https://stackoverflow.com/questions/75365839/mypy-with-dictionarys-get-function
         self.groundcommunity: int \
-            = max(self.cmnts.d_community_areas, key=self.cmnts.d_community_areas.__getitem__)
+            = max(self.communities.d_community_areas, key=self.communities.d_community_areas.__getitem__)
 
     def split_into_ground_appliedloads_members(self) -> None:
         """
@@ -108,14 +108,14 @@ class Geometry:
                 XXX
         """
         self.groundcommunity_nodes: frozenset[int] \
-            = self.cmnts.d_community_nodes[self.groundcommunity]
+            = self.communities.d_community_nodes[self.groundcommunity]
         self.groundcommunity_triangles: frozenset[int] = \
-            self.cmnts.d_community_triangles[self.groundcommunity]
+            self.communities.d_community_triangles[self.groundcommunity]
         self.groundcommunity_area: float = \
-            self.cmnts.d_community_areas[self.groundcommunity]
+            self.communities.d_community_areas[self.groundcommunity]
         self.appliedload_communities: frozenset[int] = frozenset([
             community_
-            for community_,nodes_ in self.cmnts.d_community_nodes.items()
+            for community_,nodes_ in self.communities.d_community_nodes.items()
             if len(nodes_)==3
         ])
         self.d_appliedload_communities: Dict = {
@@ -123,10 +123,10 @@ class Geometry:
             for appliedload_,community_ in enumerate(self.appliedload_communities)
         }
         self.d_appliedload_trinodes: Dict = {
-            appliedload_: self.cmnts.d_community_nodes[community_] 
+            appliedload_: self.communities.d_community_nodes[community_] 
             for appliedload_,community_ in self.d_appliedload_communities.items()
         }
-        d_community_nodes_: Dict = self.cmnts.d_community_nodes.copy()
+        d_community_nodes_: Dict = self.communities.d_community_nodes.copy()
         del d_community_nodes_[self.groundcommunity]
         for community_ in self.appliedload_communities:
             del d_community_nodes_[community_]
@@ -198,8 +198,8 @@ class Geometry:
             XXX (XXX):
                 XXX
         """
-        for community_, nodes_ in self.cmnts.d_community_nodes.items():
-            d_othercommunity_nodes: Dict = self.cmnts.d_community_nodes.copy()
+        for community_, nodes_ in self.communities.d_community_nodes.items():
+            d_othercommunity_nodes: Dict = self.communities.d_community_nodes.copy()
             del d_othercommunity_nodes[community_]
             # Now we have (1) a target community (2) the other communities
             # Search through all the nodes of the target community

@@ -43,6 +43,7 @@ class Forces:
         ) -> None:
         self.geometry = geometry 
         self.compute_appliedloads_forcevectors()
+        self.find_appliedloads_triangles()
 
     def compute_force_vector(
             self,
@@ -56,7 +57,7 @@ class Forces:
             XXX (XXX):
                 XXX
         """
-        graph = self.geometry.cmnts.graph
+        graph = self.geometry.communities.graph
         node_vertex = np.array(graph.d_node_vertices[node])
         force_vectors = [
             node_vertex-np.array(graph.d_node_vertices[trinode_])
@@ -81,4 +82,22 @@ class Forces:
                 trinodes=trinodes_
             )
             for appliedload_, trinodes_ in self.geometry.d_appliedload_trinodes.items()
+        }
+
+    def find_appliedloads_triangles(self) -> None:
+        """
+        XXX
+
+        Attributes:
+            XXX (XXX):
+                XXX
+        """
+        graph = self.geometry.communities.graph
+        self.d_appliedload_triangle: Dict = {
+            appliedload_: graph.d_trinodes_triangle[trinodes_]
+            for appliedload_,trinodes_ in self.geometry.d_appliedload_trinodes.items()
+        }
+        self.d_triangle_appliedload: Dict = {
+            triangle_: appliedload_
+            for appliedload_,triangle_ in self.d_appliedload_triangle.items()
         }
