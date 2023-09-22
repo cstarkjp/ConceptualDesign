@@ -254,9 +254,10 @@ class Visualization:
             forces: Forces,
             do_show_edges: Optional[bool] = True,
             do_lighting: Optional[bool] = False,
-            do_triangle_labels = False,
-            do_appliedload_labels = False,
-            backend: str = "trame"
+            do_triangle_labels: Optional[bool] = False,
+            do_appliedload_labels: Optional[bool] = False,
+            backend: Optional[str] = "trame",
+            font_size: Optional[int] = 10,
         ) -> PVPlotter:
         p = pv.Plotter(notebook="true",)
         _ = p.add_mesh(
@@ -269,25 +270,30 @@ class Visualization:
         )
         graph = geometry.communities.graph
         n_triangles = graph.n_triangles
+        # Check that the number of vertices (graph nodes) have the same count
         assert pvmesh.n_cells==n_triangles
         assert np.all(graph.vertices)==np.all(pvmesh.points)
-        # points = pvmesh.points
-        # mask = points[:, 0] == 0
-        # p.add_point_labels(points[mask], points[mask].tolist(), point_size=20, font_size=36)
-        # p.add_point_scalar_labels(pvmesh, "colors", point_size=20, font_size=36)
         if do_triangle_labels:
-            cell_labels = [f'{i}' for i in range(pvmesh.n_cells)]
-            p.add_point_labels(pvmesh.cell_centers(), cell_labels, font_size=10)
-        elif do_appliedload_labels and geometry is not None:
-            cell_labels = [
+            triangle_labels = [f'{i}' for i in range(pvmesh.n_cells)]
+            p.add_point_labels(
+                pvmesh.cell_centers(), 
+                triangle_labels, 
+                font_size=font_size,
+            )
+        if do_appliedload_labels:
+            # Step through all the triangles, but label only those that correspond
+            #   to an applied load
+            appliedload_labels = [
                 (f"{forces.d_triangle_appliedload[triangle_]}" 
                 if triangle_ in forces.d_triangle_appliedload
                 else "")
-                for triangle_ in range(n_triangles)
+                for triangle_ in graph.d_triangle_trinodes
             ]
-            # for triangle_ in range(n_triangles):
-            #     print(triangle_)
-            p.add_point_labels(pvmesh.cell_centers(), cell_labels, font_size=10)
+            p.add_point_labels(
+                pvmesh.cell_centers(), 
+                appliedload_labels, 
+                font_size=font_size,
+            )
         p.camera_position = "xy"
         p.show(jupyter_backend=backend)
         return p

@@ -1,3 +1,17 @@
+# def sum_Fk(Fk_set):
+#     # Fk_set = frozenset([Fk_ for Fk_ in Fk_set])
+#     Fk_sum = None
+#     for Fk_ in  Fk_set:
+#         Fk_sum = Fk_ if Fk_sum is None else Fk_sum+Fk_
+#     return Fk_sum
+
+# sum_Fk(d_keynode_Fk.values())
+
+# d_keynode_Fk = {
+#     keynode_: MatrixSymbol(rf"F_{keynode_}",2,1)
+#     for keynode_ in keynodes_
+# }
+# frozenset(d_keynode_Fk.values())
 
 
 
