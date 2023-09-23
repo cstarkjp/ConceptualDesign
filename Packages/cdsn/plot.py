@@ -315,4 +315,4 @@ class Visualization:
             dpi: (optional) plot resolution
         """
         _ = self.create_figure(fig_name=f"{name}_graph", fig_size=fig_size, dpi=dpi)
-        nx.draw_kamada_kawai(graph.nxgraph, vertex_size=20,)
+        nx.draw_kamada_kawai(graph.nxgraph, node_size=20,)

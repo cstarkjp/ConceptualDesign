@@ -1,5 +1,5 @@
 """
-Class to compute forces and torques at nodes.
+Class to classify applied loads, forces and torques at nodes.
 
 ---------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ __all__ = ["Forces"]
 
 class Forces:
     """
-    Class to compute forces and torques at nodes.
+    Class to classify applied loads, forces and torques at nodes.
 
     Args:
         geometry (Geometry):
