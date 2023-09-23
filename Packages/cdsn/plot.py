@@ -207,22 +207,22 @@ class Visualization:
         """
         # _ = self.create_figure(name, fig_size=fig_size, dpi=dpi)
         fig = self.create_figure(fig_name=f"{name}_mesh", fig_size=fig_size, dpi=dpi)
-        d_node_vertices = graph.d_node_vertices
+        d_vertex_vpoints = graph.d_vertex_vpoints
         communities_triangles = \
             communities.d_community_triangles if community is None \
             else np.array(communities.d_community_triangles, dtype=np.object_,)[community]
-        for keynode_ in geometry.d_keynode_communities:
-            plt.plot(*d_node_vertices[keynode_][0:2], "o", color="gray",)
+        for node_ in geometry.d_node_communities:
+            plt.plot(*d_vertex_vpoints[node_][0:2], "o", color="gray",)
         for ckey_, community_triangles_ in communities_triangles.items():
             c_ = "k" if ckey_== geometry.groundcommunity else color(ckey_) 
             for triangle_ in community_triangles_:
-                triangle_vertices_ = np.array([
-                    d_node_vertices[node_][0:2]
-                    for node_ in (loop(tuple(triangle_)))
+                triangle_vpoints_ = np.array([
+                    d_vertex_vpoints[vertex_][0:2]
+                    for vertex_ in (loop(tuple(triangle_)))
                 ])
-                plt.plot(*(triangle_vertices_.T), "o", c=c_, ms=2,)
-                plt.fill(*(triangle_vertices_.T), "-", c=c_, alpha=0.3,)
-                plt.plot(*(triangle_vertices_.T), "-", c=c_, alpha=1, lw=0.5,)
+                plt.plot(*(triangle_vpoints_.T), "o", c=c_, ms=2,)
+                plt.fill(*(triangle_vpoints_.T), "-", c=c_, alpha=0.3,)
+                plt.plot(*(triangle_vpoints_.T), "-", c=c_, alpha=1, lw=0.5,)
         gca = fig.gca()
         gca.set_aspect(1)
         plt.grid(":", alpha=0.3)
@@ -234,13 +234,13 @@ class Visualization:
         communities = geometry.communities
         graph = communities.graph
         faces = (
-            [[3]+list(nodes_) for nodes_ in graph.d_triangle_trinodes.values()]
+            [[3]+list(vertices_) for vertices_ in graph.d_triangle_trivertices.values()]
         )
-        pvmesh: PVMesh = pv.PolyData(graph.vertices, faces)
+        pvmesh: PVMesh = pv.PolyData(graph.vpoints, faces)
         pvmesh.cell_data["colors"] = np.zeros([graph.n_triangles,3])
-        for face_, triangles_nodes_ in communities.d_community_triangles.items():
-            for triangle_nodes_ in triangles_nodes_:
-                triangle_ = graph.d_trinodes_triangle[triangle_nodes_]
+        for face_, triangles_vertices_ in communities.d_community_triangles.items():
+            for triangle_vertices_ in triangles_vertices_:
+                triangle_ = graph.d_trivertices_triangle[triangle_vertices_]
                 pvmesh.cell_data["colors"][triangle_] = (
                     to_rgb("#d0d0d0") if face_== geometry.groundcommunity else
                     to_rgb(color(face_))
@@ -270,9 +270,9 @@ class Visualization:
         )
         graph = geometry.communities.graph
         n_triangles = graph.n_triangles
-        # Check that the number of vertices (graph nodes) have the same count
+        # Check that the number of vpoints (graph vertices) have the same count
         assert pvmesh.n_cells==n_triangles
-        assert np.all(graph.vertices)==np.all(pvmesh.points)
+        assert np.all(graph.vpoints)==np.all(pvmesh.points)
         if do_triangle_labels:
             triangle_labels = [f'{i}' for i in range(pvmesh.n_cells)]
             p.add_point_labels(
@@ -287,7 +287,7 @@ class Visualization:
                 (f"{forces.d_triangle_appliedload[triangle_]}" 
                 if triangle_ in forces.d_triangle_appliedload
                 else "")
-                for triangle_ in graph.d_triangle_trinodes
+                for triangle_ in graph.d_triangle_trivertices
             ]
             p.add_point_labels(
                 pvmesh.cell_centers(), 
@@ -315,4 +315,4 @@ class Visualization:
             dpi: (optional) plot resolution
         """
         _ = self.create_figure(fig_name=f"{name}_graph", fig_size=fig_size, dpi=dpi)
-        nx.draw_kamada_kawai(graph.nxgraph, node_size=20,)
+        nx.draw_kamada_kawai(graph.nxgraph, vertex_size=20,)

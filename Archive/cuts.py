@@ -5,13 +5,13 @@
 #         Fk_sum = Fk_ if Fk_sum is None else Fk_sum+Fk_
 #     return Fk_sum
 
-# sum_Fk(d_keynode_Fk.values())
+# sum_Fk(d_node_Fk.values())
 
-# d_keynode_Fk = {
-#     keynode_: MatrixSymbol(rf"F_{keynode_}",2,1)
-#     for keynode_ in keynodes_
+# d_node_Fk = {
+#     node_: MatrixSymbol(rf"F_{node_}",2,1)
+#     for node_ in nodes_
 # }
-# frozenset(d_keynode_Fk.values())
+# frozenset(d_node_Fk.values())
 
 
 
@@ -25,7 +25,7 @@
     #         looptri_ = np.vstack([triangle_[:,0:2],triangle_[0,0:2]]).T
     #         plt.fill(*looptri_, "-", c=color(i_), lw=1, alpha=0.3,)
     #         plt.plot(*looptri_, "-", c=color(i_), lw=1, alpha=1,)
-    #     for i_, v_ in enumerate(tm.vertices[:,0:2]):
+    #     for i_, v_ in enumerate(tm.vpoints[:,0:2]):
     #         plt.plot(*v_,"ok", ms=2,)
     #     gca = fig.gca()
     #     gca.set_aspect(1)
@@ -41,26 +41,26 @@
 
         # self.triangle_areas: NDArray = np.array([
         #     area(self.chop(np.array([
-        #         self.d_node_vertices[node_]
-        #         for node_ in triangle_
+        #         self.d_vertex_vpoints[vertex_]
+        #         for vertex_ in triangle_
         #     ])))
-        #     for triangle_ in self.d_triangle_trinodes.values()
+        #     for triangle_ in self.d_triangle_trivertices.values()
         # ])    
 
   
-    # def build_keynodes_dict(self):
+    # def build_nodes_dict(self):
     #     # This is not an efficient algorithm!
-    #     # Worse: it fails to count *all* the connected communities per keynode
-    #     for community_, nodes_ in self.d_community_nodes.items():
-    #         d_othercommunity_nodes: Dict = self.d_community_nodes.copy()
-    #         del d_othercommunity_nodes[community_]
+    #     # Worse: it fails to count *all* the connected communities per node
+    #     for community_, vertices_ in self.d_community_vertices.items():
+    #         d_othercommunity_vertices: Dict = self.d_community_vertices.copy()
+    #         del d_othercommunity_vertices[community_]
     #         # Now we have (1) a target community(2) the other communities
     #         # Step through the other communities
-    #         for othercommunity_, othernodes_ in d_othercommunity_nodes.items():
-    #             # Search through all the nodes of the target community
-    #             for node_ in nodes_:
-    #                 if node_ in othernodes_:
-    #                     yield(node_, (community_,othercommunity_))
+    #         for othercommunity_, othervertices_ in d_othercommunity_vertices.items():
+    #             # Search through all the vertices of the target community
+    #             for vertex_ in vertices_:
+    #                 if vertex_ in othervertices_:
+    #                     yield(vertex_, (community_,othercommunity_))
 
 
 from operator import add
@@ -84,12 +84,12 @@ plotter.show(jupyter_backend="trame")
     #     self.sorted_triangle_indexes: NDArray = np.r_[list(np.flip(
     #         np.argsort(self.triangle_areas)
     #     ))]
-    #     self.sorted_triangles: NDArray = (np.array(self.d_triangle_trinodes)[self.sorted_triangle_indexes])
+    #     self.sorted_triangles: NDArray = (np.array(self.d_triangle_trivertices)[self.sorted_triangle_indexes])
 
 
-    # def find_ground_vertices(self):
-    #     chopped_vertices: NDArray = self.chop(self.vertices)[:,0:2]
-    #     self.ground_vertices: NDArray = np.argwhere(chopped_vertices[:,1]==0).flatten()       
+    # def find_ground_vpoints(self):
+    #     chopped_vpoints: NDArray = self.chop(self.vpoints)[:,0:2]
+    #     self.ground_vpoints: NDArray = np.argwhere(chopped_vpoints[:,1]==0).flatten()       
 
 
 # import pyvista as pv
@@ -120,7 +120,7 @@ plotter.show(jupyter_backend="trame")
 # axes.set_zticks([]);
 
 # fig = viz.create_figure(fig_name=f"trimesh", fig_size=(8,8,),)
-# for v_ in tm.vertices[:,0:2]:
+# for v_ in tm.vpoints[:,0:2]:
 #     # looptri_ = np.vstack([triangle_[:,0:2],triangle_[0,0:2]]).T
 #     # plt.fill(*looptri_, "-", c=color(i_), lw=1, alpha=0.1,)
 #     # plt.plot(*looptri_, "-", c=color(i_), lw=1, alpha=1,)
@@ -149,7 +149,7 @@ plotter.show(jupyter_backend="trame")
 #         # plt.plot(*v2_,"s", c=color(i_), ms=5, )
 #         # plt.plot(v0_[0],v1_[1],".", c=color(i_),)
 #         # break
-#     for i_, v_ in enumerate(tm.vertices[:,0:2]):
+#     for i_, v_ in enumerate(tm.vpoints[:,0:2]):
 #         # looptri_ = np.vstack([triangle_[:,0:2],triangle_[0,0:2]]).T
 #         # plt.fill(*looptri_, "-", c=color(i_), lw=1, alpha=0.1,)
 #         # plt.plot(*looptri_, "-", c=color(i_), lw=1, alpha=1,)

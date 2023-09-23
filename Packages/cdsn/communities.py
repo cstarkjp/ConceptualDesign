@@ -27,7 +27,7 @@ warnings.filterwarnings("ignore")
 
 __all__ = ["Communities"]
 
-is_node_in = lambda triangle_,community_: 1 if triangle_ in community_ else 0
+is_vertex_in = lambda triangle_,community_: 1 if triangle_ in community_ else 0
 area = lambda v: np.abs(np.dot((v[1]-v[0]),(v[1]-v[0])))
 
 class Communities:
@@ -39,8 +39,8 @@ class Communities:
             object containing nxgraph built from mesh and related properties
 
     Attributes:
-        d_community_nodes (dict):
-            dictionary of nodes grouped and indexed by their 3-clique community
+        d_community_vertices (dict):
+            dictionary of vertices grouped and indexed by their 3-clique community
         n_communities (int):
             number of 3-clique communities
         d_community_triangles (dict):
@@ -55,11 +55,11 @@ class Communities:
             graph: Graph,
         ) -> None:
         self.graph = graph
-        self.find_community_nodes()
+        self.find_community_vertices()
         self.find_community_triangles()
         self.find_community_areas()
 
-    def find_community_nodes(self) -> None:
+    def find_community_vertices(self) -> None:
         """
         XXX
 
@@ -67,13 +67,13 @@ class Communities:
             XXX (XXX):
                 XXX
         """
-        self.d_community_nodes: Dict = {
+        self.d_community_vertices: Dict = {
             key_: community_ 
             for key_, community_ in enumerate(
                 nx.community.k_clique_communities(self.graph.nxgraph,3)
             )
         }
-        self.n_communities: int = max(self.d_community_nodes)+1
+        self.n_communities: int = max(self.d_community_vertices)+1
 
     def find_community_triangles(self) -> None:
         """
@@ -85,9 +85,9 @@ class Communities:
         """
         self.d_community_triangles: Dict = {
             key_: frozenset(list(
-                self.find_triangles_in(self.graph.d_triangle_trinodes, community_,)
+                self.find_triangles_in(self.graph.d_triangle_trivertices, community_,)
             ))
-            for key_,community_ in self.d_community_nodes.items()
+            for key_,community_ in self.d_community_vertices.items()
         }
 
     def find_community_areas(self) -> None:
@@ -100,7 +100,7 @@ class Communities:
         """
         self.d_community_areas: Dict = {
             key_: np.sum(np.array([
-                area(self.graph.chop(self.graph.vertices[np.r_[tuple(triangle_)]]))            
+                area(self.graph.chop(self.graph.vpoints[np.r_[tuple(triangle_)]]))            
                 for triangle_ in triangles_
             ]))
             for key_,triangles_ in self.d_community_triangles.items()
@@ -122,11 +122,11 @@ class Communities:
             XXX (XXX):
                 XXX
         """
-        triangle_nodes_: Tuple[int,int,int]
-        for triangle_nodes_ in triangles.values():
-            n_shared_nodes = sum([
-                is_node_in(triangle_node_, community)
-                for triangle_node_ in triangle_nodes_
+        triangle_vertices_: Tuple[int,int,int]
+        for triangle_vertices_ in triangles.values():
+            n_shared_vertices = sum([
+                is_vertex_in(triangle_vertex_, community)
+                for triangle_vertex_ in triangle_vertices_
             ])
-            if n_shared_nodes==3:
-                yield(triangle_nodes_)
+            if n_shared_vertices==3:
+                yield(triangle_vertices_)
