@@ -185,7 +185,7 @@ class Visualization:
         fig.set_dpi(dpi_)
         return fig
 
-    def plot_model(
+    def plot_model_2D(
             self, 
             name: str,
             graph: Graph,
@@ -227,7 +227,7 @@ class Visualization:
         gca.set_aspect(1)
         plt.grid(":", alpha=0.3)
 
-    def build_mesh(
+    def build_pvmesh(
             self, 
             geometry: Geometry,
         ) -> PVMesh:
@@ -250,7 +250,8 @@ class Visualization:
     def plot_model_3d(
             self,
             pvmesh: PVMesh,
-            geometry: Geometry,
+            graph: Graph,
+            # geometry: Geometry,
             forces: Forces,
             do_show_edges: Optional[bool] = True,
             do_lighting: Optional[bool] = False,
@@ -268,7 +269,6 @@ class Visualization:
             show_edges=do_show_edges,
             preference="cell",
         )
-        graph = geometry.communities.graph
         n_triangles = graph.n_triangles
         # Check that the number of vpoints (graph vertices) have the same count
         assert pvmesh.n_cells==n_triangles
@@ -298,7 +298,7 @@ class Visualization:
         p.show(jupyter_backend=backend)
         return p
     
-    def plot_graph(
+    def plot_network_graph(
             self,
             name: str,
             graph: Graph,
