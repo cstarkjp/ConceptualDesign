@@ -270,7 +270,7 @@ class Visualization:
             preference="cell",
         )
         n_triangles = graph.n_triangles
-        # Check that the number of vpoints (graph vertices) have the same count
+        # Check that the number of vpoints (graph vertex positions) have the same count
         assert pvmesh.n_cells==n_triangles
         assert np.all(graph.vpoints)==np.all(pvmesh.points)
         if do_triangle_labels:
