@@ -59,8 +59,9 @@ class Graph:
         self.build_graph()
         # Then analyze the graph to find all the triangles and how they cluster
         self.tolerance: float = 1e-10
-        self.find_vpoints()
-        self.find_triangles()
+        self.round: int = 6
+        self.label_vertices()
+        self.label_triangles()
         self.compute_triangle_areas()
 
     def chop(self, array: NDArray) -> NDArray:
@@ -90,12 +91,13 @@ class Graph:
                 XXX
         """
         self.edges: NDArray = self.mesh.trimesh.edges_unique
-        self.edge_lengths: TrimeshTrackedArray[float] = self.mesh.trimesh.edges_unique_length
+        self.edge_lengths: TrimeshTrackedArray[float] \
+            = self.mesh.trimesh.edges_unique_length
         self.nxgraph: NXGraph = nx.Graph()
         for edge_, length_ in zip(self.edges, self.edge_lengths):
             self.nxgraph.add_edge(*edge_, length=length_)
         
-    def find_vpoints(self) -> None:
+    def label_vertices(self) -> None:
         """
         XXX
 
@@ -103,13 +105,14 @@ class Graph:
             XXX (XXX):
                 XXX
         """
-        self.vpoints: TrimeshTrackedArray[float,float,float] = self.mesh.trimesh.vertices
+        self.vpoints: TrimeshTrackedArray[float,float,float] \
+            = np.round(self.mesh.trimesh.vertices, self.round)
         self.d_vertex_vpoints: Dict[int,NDArray] = {
-            key_: np.array(vpoints_)
-            for key_,vpoints_ in enumerate(self.vpoints)
+            vertex_: np.array(vpoints_)
+            for vertex_,vpoints_ in enumerate(self.vpoints)
         }
 
-    def find_triangles(self) -> None:
+    def label_triangles(self) -> None:
         """
         XXX
 
@@ -117,13 +120,14 @@ class Graph:
             XXX (XXX):
                 XXX
         """
-        triangles_: Generator = nx.simple_cycles(self.nxgraph, length_bound=3,)
+        trivertices_generator: Generator = nx.simple_cycles(self.nxgraph, length_bound=3,)
         self.d_triangle_trivertices: Dict = {
-            key_: frozenset(sorted(triangle_)) 
-            for key_,triangle_ in enumerate(list(triangles_))
+            triangle_: frozenset(sorted(trivertices_)) 
+            for triangle_,trivertices_ in enumerate(list(trivertices_generator))
         }
         self.d_trivertices_triangle: Dict = {
-            vertices_: key_ for key_, vertices_ in self.d_triangle_trivertices.items()
+            trivertices_: triangle_ 
+            for triangle_, trivertices_ in self.d_triangle_trivertices.items()
         }
         self.n_triangles: int = max(self.d_triangle_trivertices)+1
     

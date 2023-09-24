@@ -155,6 +155,33 @@ class Topology:
             = dict(sorted(d.items(), key=lambda item: item[0]))
         self.nodes = frozenset(self.d_node_communities)
 
+    def build_nodes_dict(self) -> Iterable[Tuple[int, frozenset]]:
+        """
+        XXX
+
+        Attributes:
+            XXX (XXX):
+                XXX
+        """
+        community_vertices = self.communities.d_community_vertices
+        for target_community_, target_vertices_ in community_vertices.items():
+            othercommunity_vertices: Dict = community_vertices.copy()
+            del othercommunity_vertices[target_community_]
+            # print((target_community_, target_vertices_), list(othercommunity_vertices.items()), )
+            # Now we have (1) a target community (2) the other communities
+            # Search through all the vertices of the target community
+            for target_vertex_ in target_vertices_:
+                # Use set intersection to check if the target community
+                #   and the current other community share this vertex => node
+                connected_communities_: List = [target_community_] + [
+                    othercommunity_
+                    for othercommunity_, othervertices_ in othercommunity_vertices.items()
+                    if len(frozenset((target_vertex_,)).intersection(othervertices_))>0
+                ]
+                # print(f"Connected? {connected_communities_}")
+                if len(connected_communities_)>1:
+                    yield(target_vertex_, frozenset(sorted(connected_communities_)))
+
     def find_nodes_members(self) -> None:
         """
         XXX
@@ -189,30 +216,6 @@ class Topology:
             )
             for member_, vertices_ in self.d_member_vertices.items()
         }
-
-    def build_nodes_dict(self) -> Iterable[Tuple[int, frozenset]]:
-        """
-        XXX
-
-        Attributes:
-            XXX (XXX):
-                XXX
-        """
-        for community_, vertices_ in self.communities.d_community_vertices.items():
-            d_othercommunity_vertices: Dict = self.communities.d_community_vertices.copy()
-            del d_othercommunity_vertices[community_]
-            # Now we have (1) a target community (2) the other communities
-            # Search through all the vertices of the target community
-            for vertex_ in vertices_:
-                # Use set intersection to check if the target community
-                #   and the current other community share this vertex => node
-                connected_communities_: List = [community_] + [
-                    othercommunity_
-                    for othercommunity_, othervertices_ in d_othercommunity_vertices.items()
-                    if len(frozenset((vertex_,)).intersection(othervertices_))>0
-                ]
-                if len(connected_communities_)>1:
-                    yield(vertex_, frozenset(sorted(connected_communities_)))
 
     def find_appliedloads_nodes(self) -> None:
         """

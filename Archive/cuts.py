@@ -1,3 +1,30 @@
+vpoints_list = [tuple(vpoint_) for vpoint_ in (np.round(graph.vpoints,3))]
+vpoints_set = frozenset(vpoints_list)
+# [vpoint_ for vpoint_ in vpoints_set if vpoint_ in vpoints_list]
+# if vpoints_list!=vpoints_set:
+#     [
+#         vertex_,vpoints_ 
+#         for vertex_,vpoints_ in graph.d_vertex_vpoints.items()
+#         if 
+#     ]
+
+vpoints_multiset = Counter()
+for vpoint_ in ((graph.vpoints)):
+    vpoints_multiset.update([tuple(vpoint_)])
+pp(vpoints_multiset)
+
+
+
+
+
+
+
+
+
+
+
+
+
 # def sum_Fk(Fk_set):
 #     # Fk_set = frozenset([Fk_ for Fk_ in Fk_set])
 #     Fk_sum = None

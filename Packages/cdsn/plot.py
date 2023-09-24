@@ -302,6 +302,7 @@ class Visualization:
             self,
             name: str,
             graph: Graph,
+            draw_method: str = "kamada",
             fig_size: Optional[Tuple[float, float]] = None,
             dpi: Optional[int] = None,
         ) -> None:
@@ -315,4 +316,10 @@ class Visualization:
             dpi: (optional) plot resolution
         """
         _ = self.create_figure(fig_name=f"{name}_graph", fig_size=fig_size, dpi=dpi)
-        nx.draw_kamada_kawai(graph.nxgraph, node_size=20,)
+        draw_methods = {
+            "kamada": nx.draw_kamada_kawai,
+            "spring": nx.draw_spring,
+        }
+        if draw_method in draw_methods:
+            draw_methods[draw_method](graph.nxgraph, node_size=20,)
+        

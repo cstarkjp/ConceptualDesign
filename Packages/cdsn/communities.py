@@ -85,7 +85,7 @@ class Communities:
         """
         self.d_community_triangles: Dict = {
             key_: frozenset(list(
-                self.find_triangles_in(self.graph.d_triangle_trivertices, community_,)
+                self.label_triangles_in(self.graph.d_triangle_trivertices, community_,)
             ))
             for key_,community_ in self.d_community_vertices.items()
         }
@@ -107,7 +107,7 @@ class Communities:
         }
 
     @staticmethod
-    def find_triangles_in(
+    def label_triangles_in(
             triangles: Dict, 
             community: frozenset,
         ) -> Generator:

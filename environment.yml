@@ -17,10 +17,11 @@ dependencies:
   # - sympy
   # - numpy-stl
   - trimesh
-  - networkx # needed by trimesh but dependency not set
-  - pyglet   # needed by trimesh but dependency not set
-  - lxml   # needed by trimesh but dependency not set
-  - rtree   # needed by trimesh but dependency not set
+  - networkx    # needed by trimesh but dependency not set
+  - pyglet      # needed by trimesh but dependency not set
+  - lxml        # needed by trimesh but dependency not set
+  - rtree       # needed by trimesh but dependency not set
+  - pycollada   # if you want trimesh to read Collada files
   - pyvista
   # - sympy_plot_backends[all]
 
