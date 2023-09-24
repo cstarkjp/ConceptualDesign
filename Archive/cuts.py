@@ -15,7 +15,7 @@
 
 
 
-    # def plot_raw_model(self, mg: Geometry,) -> None:
+    # def plot_raw_model(self, mg: Topology,) -> None:
     #     fig = self.create_figure(fig_name=f"mesh", fig_size=(8,8,),)
     #     m = mg.mesh
     #     tm = mg.trimesh

@@ -32,7 +32,7 @@ from cdsn.definitions import (
 )
 from cdsn.graph import Graph
 from cdsn.communities import Communities
-from cdsn.geometry import Geometry
+from cdsn.topology import Topology
 from cdsn.forces import Forces
 
 warnings.filterwarnings("ignore")
@@ -190,17 +190,17 @@ class Visualization:
             name: str,
             graph: Graph,
             communities: Communities,
-            geometry: Geometry,
+            topology: Topology,
             community: Optional[Any] = None, #np.lib.index_tricks.IndexExpression]
             fig_size: Optional[Tuple[float, float]] = None,
             dpi: Optional[int] = None,
         ) -> None:
         r"""
-        Plot model geometry in 2D.
+        Plot model topology in 2D.
 
         Arguments:
             name: reference for figure dictionary
-            mg: model geometry
+            mg: model topology
             community: numpy slice of subset of clique communities to plot
             fig_size: (optional) x,y dimensions of figure
             dpi: (optional) plot resolution
@@ -211,10 +211,10 @@ class Visualization:
         communities_triangles = \
             communities.d_community_triangles if community is None \
             else np.array(communities.d_community_triangles, dtype=np.object_,)[community]
-        for node_ in geometry.d_node_communities:
+        for node_ in topology.d_node_communities:
             plt.plot(*d_vertex_vpoints[node_][0:2], "o", color="gray",)
         for ckey_, community_triangles_ in communities_triangles.items():
-            c_ = "k" if ckey_== geometry.groundcommunity else color(ckey_) 
+            c_ = "k" if ckey_== topology.groundcommunity else color(ckey_) 
             for triangle_ in community_triangles_:
                 triangle_vpoints_ = np.array([
                     d_vertex_vpoints[vertex_][0:2]
@@ -229,9 +229,9 @@ class Visualization:
 
     def build_pvmesh(
             self, 
-            geometry: Geometry,
+            topology: Topology,
         ) -> PVMesh:
-        communities = geometry.communities
+        communities = topology.communities
         graph = communities.graph
         faces = (
             [[3]+list(vertices_) for vertices_ in graph.d_triangle_trivertices.values()]
@@ -242,7 +242,7 @@ class Visualization:
             for triangle_vertices_ in triangles_vertices_:
                 triangle_ = graph.d_trivertices_triangle[triangle_vertices_]
                 pvmesh.cell_data["colors"][triangle_] = (
-                    to_rgb("#d0d0d0") if face_== geometry.groundcommunity else
+                    to_rgb("#d0d0d0") if face_== topology.groundcommunity else
                     to_rgb(color(face_))
                 )
         return pvmesh
@@ -251,7 +251,7 @@ class Visualization:
             self,
             pvmesh: PVMesh,
             graph: Graph,
-            # geometry: Geometry,
+            # topology: Topology,
             forces: Forces,
             do_show_edges: Optional[bool] = True,
             do_lighting: Optional[bool] = False,

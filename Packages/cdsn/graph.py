@@ -1,5 +1,5 @@
 """
-Class to convert mesh geometry into a networkx graph.
+Class to convert mesh topology into a networkx graph.
 
 ---------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ area = lambda v: np.abs(np.dot((v[1]-v[0]),(v[1]-v[0])))
 
 class Graph:
     """
-    Class to convert mesh geometry into a networkx graph.
+    Class to convert mesh topology into a networkx graph.
 
     Args:
         mesh (Mesh):

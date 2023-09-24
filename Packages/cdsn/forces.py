@@ -19,7 +19,7 @@ import numpy as np
 from cdsn.definitions import (
     NDArray, Trimesh, TrimeshTrackedArray, NXGraph
 )
-from cdsn.geometry import Geometry
+from cdsn.topology import Topology
 
 warnings.filterwarnings("ignore")
 
@@ -30,8 +30,8 @@ class Forces:
     Class to classify applied loads, forces and torques at nodes.
 
     Args:
-        geometry (Geometry):
-            model geometry object
+        topology (Topology):
+            model topology object
 
     Attributes:
         XXX (XXX):
@@ -39,9 +39,9 @@ class Forces:
     """
     def __init__(
             self,
-            geometry: Geometry,
+            topology: Topology,
         ) -> None:
-        self.geometry = geometry 
+        self.topology = topology 
         self.compute_appliedloads_forcevectors()
         self.find_appliedloads_triangles()
 
@@ -57,7 +57,7 @@ class Forces:
             XXX (XXX):
                 XXX
         """
-        graph = self.geometry.communities.graph
+        graph = self.topology.communities.graph
         vertex_vertex = np.array(graph.d_vertex_vpoints[vertex])
         force_vectors = [
             vertex_vertex-np.array(graph.d_vertex_vpoints[trivertex_])
@@ -78,10 +78,10 @@ class Forces:
         """
         self.d_appliedload_forcevector: Dict = {
             appliedload_: self.compute_force_vector(
-                vertex=self.geometry.d_appliedload_node[appliedload_],
+                vertex=self.topology.d_appliedload_node[appliedload_],
                 trivertices=trivertices_
             )
-            for appliedload_, trivertices_ in self.geometry.d_appliedload_trivertices.items()
+            for appliedload_, trivertices_ in self.topology.d_appliedload_trivertices.items()
         }
 
     def find_appliedloads_triangles(self) -> None:
@@ -92,10 +92,10 @@ class Forces:
             XXX (XXX):
                 XXX
         """
-        graph = self.geometry.communities.graph
+        graph = self.topology.communities.graph
         self.d_appliedload_triangle: Dict = {
             appliedload_: graph.d_trivertices_triangle[trivertices_]
-            for appliedload_,trivertices_ in self.geometry.d_appliedload_trivertices.items()
+            for appliedload_,trivertices_ in self.topology.d_appliedload_trivertices.items()
         }
         self.d_triangle_appliedload: Dict = {
             triangle_: appliedload_

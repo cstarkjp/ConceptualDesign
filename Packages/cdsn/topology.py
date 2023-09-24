@@ -24,15 +24,15 @@ from cdsn.communities import Communities
 
 warnings.filterwarnings("ignore")
 
-__all__ = ["Geometry"]
+__all__ = ["Topology"]
 
-class Geometry:
+class Topology:
     """
     Class to partition the communities derived from a mesh-based graph into ground, members and applied loads.
 
     Args:
         communities (Community):
-            name of source geometry STL file (stem only)
+            name of source topology STL file (stem only)
 
     Attributes:
         groundcommunity (int):

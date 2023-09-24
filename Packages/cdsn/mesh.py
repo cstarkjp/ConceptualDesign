@@ -1,5 +1,5 @@
 """
-Class to build a mesh geometry from an STL file.
+Class to build a mesh topology from an STL file.
 
 ---------------------------------------------------------------------
 
@@ -28,11 +28,11 @@ __all__ = ["Mesh"]
 
 class Mesh:
     """
-    Class to build a mesh geometry from an STL file.
+    Class to build a mesh topology from an STL file.
 
     Args:
         name (str):
-            name of source geometry STL file (stem only)
+            name of source topology STL file (stem only)
         data_path (optional str):
             relative path from here to data STL files (assumed to be ../Data/STL/)
 

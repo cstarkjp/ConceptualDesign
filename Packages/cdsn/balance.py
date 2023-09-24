@@ -52,26 +52,26 @@ class Balance:
         self.compute_member_forcemoment()
 
     def setup_node_fvc(self) -> None:
-        geometry = self.forces.geometry
+        topology = self.forces.topology
         self.d_node_fvc = {
             node_: {
                 "X": Symbol(rf"F_{node_},X", real=True,),
                 "Y": Symbol(rf"F_{node_},Y", real=True,),
             }
-            for node_ in geometry.d_node_members
+            for node_ in topology.d_node_members
         }
 
     def setup_member_fvc(self) -> None:
-        geometry = self.forces.geometry
+        topology = self.forces.topology
         self.d_member_fvc = {
             member_: [self.d_node_fvc[node_] for node_ in nodes_]
-            for member_, nodes_ in geometry.d_member_nodes.items()
+            for member_, nodes_ in topology.d_member_nodes.items()
         }
 
     def compute_member_forceinfo(self) -> None:
         n_round = 6
-        geometry = self.forces.geometry
-        graph = geometry.communities.graph
+        topology = self.forces.topology
+        graph = topology.communities.graph
         self.d_member_forceinfo = {
             member_: (
                 M := MatrixSymbol(r"\mathbf{M}"+f"_{member_}",3,len(fvc_),),
@@ -93,7 +93,7 @@ class Balance:
                 )
             )
             for ((member_,fvc_),(member_,nodes_))
-            in zip(self.d_member_fvc.items(),geometry.d_member_nodes.items())
+            in zip(self.d_member_fvc.items(),topology.d_member_nodes.items())
         }
 
     def compute_member_forcemoment(self) -> None:
