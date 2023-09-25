@@ -25,6 +25,7 @@ dependencies:
   - pyvista
   # - sympy_plot_backends[all]
 
+# pip install pygltflib   # alternative way of reading glTF files
 
 
 ## Add environment variables to this conda env:

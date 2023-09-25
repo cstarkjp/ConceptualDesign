@@ -18,6 +18,9 @@ from typing import (
 import os
 import trimesh
 
+from trimesh.visual import texture, TextureVisuals
+from trimesh import Trimesh
+
 from cdsn.definitions import (
     NDArray, Trimesh, TrimeshTrackedArray, NXGraph
 )
@@ -96,3 +99,27 @@ class Mesh:
             force="mesh",
         )
         self.trimesh.merge_vertices(merge_tex=True,)
+
+
+# from trimesh.visual import texture, TextureVisuals
+# from trimesh import Trimesh
+
+# def get_texture(my_uvs, img):
+#     # img is PIL Image
+#     uvs = my_uvs
+#     material = texture.SimpleMaterial(image=img)    
+#     texture = TextureVisuals(uv=uvs, image=img, material=material)
+
+# my_uvs = [....] # 2d array list
+# vertices = [....] # 3d array list
+# faces = [....] # indices list
+# face_normals = [....] # 3d array list
+# texture_visual = get_texture(my_uvs, img)
+# mesh = Trimesh(
+#             vertices=vertices,
+#             faces=faces,
+#             face_normals=face_normals,
+#             visual=texture_visual,
+#             validate=True,
+#             process=False
+#         )
