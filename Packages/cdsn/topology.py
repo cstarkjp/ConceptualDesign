@@ -80,7 +80,7 @@ class Topology:
         self.find_groundcommunity() 
         self.split_into_ground_appliedloads_members()
         self.find_nodes_communities()
-        self.find_nodes_members()
+        # self.find_nodes_members()
         self.find_members_nodes()
         self.find_appliedloads_nodes()
         self.find_members_appliedloads()
@@ -182,25 +182,25 @@ class Topology:
                 if len(connected_communities_)>1:
                     yield(target_vertex_, frozenset(sorted(connected_communities_)))
 
-    def find_nodes_members(self) -> None:
-        """
-        XXX
+    # def find_nodes_members(self) -> None:
+    #     """
+    #     XXX
 
-        Attributes:
-            XXX (XXX):
-                XXX
-        """
-        self.d_node_members: Dict = {
-            node_: frozenset([
-                self.d_community_member[community_]
-                if community_ in self.d_community_member else (
-                    "force" if community_ in self.d_appliedload_communities.values()
-                    else "ground"
-                )
-                for community_ in communities_
-            ])
-            for node_, communities_ in self.d_node_communities.items()
-        }
+    #     Attributes:
+    #         XXX (XXX):
+    #             XXX
+    #     """
+    #     self.d_node_members: Dict = {
+    #         node_: frozenset([
+    #             self.d_community_member[community_]
+    #             if community_ in self.d_community_member else (
+    #                 "force" if community_ in self.d_appliedload_communities.values()
+    #                 else "ground"
+    #             )
+    #             for community_ in communities_
+    #         ])
+    #         for node_, communities_ in self.d_node_communities.items()
+    #     }
 
     def find_members_nodes(self) -> None:
         """

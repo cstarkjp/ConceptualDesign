@@ -58,7 +58,7 @@ class Balance:
                 "X": Symbol(rf"F_{node_},X", real=True,),
                 "Y": Symbol(rf"F_{node_},Y", real=True,),
             }
-            for node_ in topology.d_node_members
+            for node_ in topology.d_node_communities
         }
 
     def setup_member_fvc(self) -> None:
