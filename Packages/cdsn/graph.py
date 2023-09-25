@@ -43,6 +43,8 @@ class Graph:
             x,y,z positions of graph vertices
         d_vertex_vpoints (dict[int,NDArray[float,float,float]]):
             vertex-indexed dictionary of x,y,z vpoints
+        d_vpoints_vertex:
+            XXX
         d_triangle_trivertices (dict[int,frozenset[int,int,int]]):
             triangle-indexed dictionary of triangle vertices
         d_trivertices_triangle (dict[frozenset,int]):
@@ -107,9 +109,13 @@ class Graph:
         """
         self.vpoints: TrimeshTrackedArray[float,float,float] \
             = np.round(self.mesh.trimesh.vertices, self.round)
-        self.d_vertex_vpoints: Dict[int,NDArray] = {
-            vertex_: np.array(vpoints_)
+        self.d_vertex_vpoints: Dict[int,tuple] = {
+            vertex_: tuple(vpoints_)
             for vertex_,vpoints_ in enumerate(self.vpoints)
+        }
+        self.d_vpoints_vertex: Dict[int,tuple] = {
+            vpoints_: vertex_
+            for vertex_,vpoints_ in self.d_vertex_vpoints.items()
         }
 
     def label_triangles(self) -> None:

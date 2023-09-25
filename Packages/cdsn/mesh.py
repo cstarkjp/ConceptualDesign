@@ -16,6 +16,7 @@ from typing import (
 )
 
 import os
+import numpy as np
 import trimesh
 
 from trimesh.visual import texture, TextureVisuals
@@ -55,9 +56,10 @@ class Mesh:
         ) -> None:
         # Read model from STL or other format file
         self.name = name
-        self.read_from_file(data_path, name, file_type,)
+        self.read_file_into_trimesh(data_path, name, file_type,)
+        self.read_gltf_file()
 
-    def read_from_file(
+    def read_file_into_trimesh(
             self,
             data_path: str,
             name: str,
@@ -80,8 +82,6 @@ class Mesh:
             trimesh (Trimesh):
                 processed mesh as a Trimesh object
         """
-        # Collada doesn't work yet. Gives error in graph():
-        #  AttributeError: 'Scene' object has no attribute 'edges_unique'
         d_file_types = {
             "stl": "stl",
             "dae": "dae",
@@ -99,8 +99,14 @@ class Mesh:
             process=True,
             force="mesh",
         )
+        # Merge coincident vertices
         self.trimesh.merge_vertices(merge_tex=True,)
 
+    def read_gltf_file(
+            self,
+        ) -> None:
+        """
+        """
         # If this is a glTF and we have metadata available:
         self.gltf: Optional[Dict] = None
         self.d_gltf_json: Optional[Dict] = None
@@ -119,10 +125,37 @@ class Mesh:
                 glnode_["mesh"]: glnode_["name"] 
                 for glnode_ in self.d_gltf_json["nodes"]
             }
+            self.d_glvertex_glnode = {
+                glvertex_: glnode_
+                for glnode_, glvertex_ in list(self.get_glvertices())
+            }
         else:
             self.gltf = None
             self.d_gltf_json = None
             self.d_glnode_info = None
+
+    def get_glvertices(self):
+        import struct
+        gltf = self.gltf
+        for glnode_ in gltf.scenes[gltf.scene].nodes:
+            # get the vertices for each primitive in the mesh 
+            for primitive_ in gltf.meshes[glnode_].primitives:
+                print(primitive_)
+                # get the binary data for this mesh primitive from the buffer
+                accessor = gltf.accessors[primitive_.attributes.POSITION]
+                buffer_view = gltf.bufferViews[accessor.bufferView]
+                buffer = gltf.buffers[buffer_view.buffer]
+                data = gltf.get_data_from_buffer_uri(buffer.uri)
+
+                # pull each vertex from the binary buffer and convert it into a tuple of python floats
+                for i_ in range(accessor.count):
+                    # the location in the buffer of this vertex
+                    index = buffer_view.byteOffset + accessor.byteOffset + i_*12  
+                    # the vertex data
+                    d = data[index:index+12]
+                    # convert from base64 to three floats
+                    v = struct.unpack("<fff", d)
+                    yield(glnode_, tuple(np.round(np.array(v),6)))
  
     # def parse(self) -> None:
     #     self.member_info: Dict = {
