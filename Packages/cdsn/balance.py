@@ -74,14 +74,16 @@ class Balance:
         graph = topology.communities.graph
         self.d_member_forceinfo = {
             member_: (
-                M := MatrixSymbol(r"\mathbf{M}"+f"_{member_}",3,len(fvc_),),
+                # Do it the old-fashioned way, so that multi-digit subscripts get
+                #   latex-rendered correctly
+                M := MatrixSymbol(r"\mathbf{M}_{%d}" % member_,3,len(fvc_),),
                 M_ := Matrix([
                     [1]*len(fvc_)+[0]*len(fvc_),
                     [0]*len(fvc_)+[1]*len(fvc_),
                     [np.round(graph.d_vertex_vpoints[node_][0],n_round) for node_ in nodes_]
                     +[np.round(graph.d_vertex_vpoints[node_][1],n_round) for node_ in nodes_]
                 ]),
-                F := MatrixSymbol(r"\mathbf{F}"+f"_{member_}",len(fvc_),1),
+                F := MatrixSymbol(r"\mathbf{F}_{%d}" % member_,len(fvc_),1),
                 F_ := Matrix(
                     [
                         fvxy_["X"]
