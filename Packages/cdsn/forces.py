@@ -81,7 +81,7 @@ class Forces:
                 vertex=self.topology.d_appliedload_node[appliedload_],
                 trivertices=trivertices_
             )
-            for appliedload_, trivertices_ in self.topology.d_appliedload_trivertices.items()
+            for appliedload_, trivertices_ in self.topology.d_appliedload_vertices.items()
         }
 
     def find_appliedloads_triangles(self) -> None:
@@ -95,7 +95,7 @@ class Forces:
         graph = self.topology.communities.graph
         self.d_appliedload_triangle: Dict = {
             appliedload_: graph.d_trivertices_triangle[trivertices_]
-            for appliedload_,trivertices_ in self.topology.d_appliedload_trivertices.items()
+            for appliedload_,trivertices_ in self.topology.d_appliedload_vertices.items()
         }
         self.d_triangle_appliedload: Dict = {
             triangle_: appliedload_

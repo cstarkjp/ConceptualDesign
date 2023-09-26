@@ -65,6 +65,7 @@ class Graph:
         self.label_vertices()
         self.label_triangles()
         self.compute_triangle_areas()
+        self.vertices = frozenset(self.d_vertex_vpoints.keys())
 
     def chop(self, array: NDArray) -> NDArray:
         """
@@ -113,9 +114,13 @@ class Graph:
             vertex_: tuple(vpoints_)
             for vertex_,vpoints_ in enumerate(self.vpoints)
         }
-        self.d_vpoints_vertex: Dict[int,tuple] = {
+        self.d_vpoints_vertex: Dict[tuple,int] = {
             vpoints_: vertex_
             for vertex_,vpoints_ in self.d_vertex_vpoints.items()
+        }
+        self.d_vertex_info: Dict[int,str] = {
+            self.d_vpoints_vertex[glvpoint_]: self.mesh.d_glpvertex_info[glpvertex_]
+            for glvpoint_, glpvertex_ in self.mesh.d_glvpoint_glpvertex.items()
         }
 
     def label_triangles(self) -> None:
@@ -126,7 +131,8 @@ class Graph:
             XXX (XXX):
                 XXX
         """
-        trivertices_generator: Generator = nx.simple_cycles(self.nxgraph, length_bound=3,)
+        trivertices_generator: Generator \
+            = nx.simple_cycles(self.nxgraph, length_bound=3,)
         self.d_triangle_trivertices: Dict = {
             triangle_: frozenset(sorted(trivertices_)) 
             for triangle_,trivertices_ in enumerate(list(trivertices_generator))

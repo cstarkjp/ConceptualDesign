@@ -110,37 +110,37 @@ class Mesh:
         # If this is a glTF and we have metadata available:
         self.gltf: Optional[Dict] = None
         self.d_gltf_json: Optional[Dict] = None
-        self.d_glnode_info: Optional[Dict] = None
+        self.d_glpvertex_info: Optional[Dict] = None
         if self.file_type=="gltf":
             from pygltflib import GLTF2
             self.gltf = GLTF2().load(self.file_path_name)
-            # self.d_glnode_info: Dict = {
-            #     glnode_.mesh: glnode_.name 
-            #     for glnode_ in self.gltf.nodes
+            # self.d_glpvertex_info: Dict = {
+            #     glpvertex_.mesh: glpvertex_.name 
+            #     for glpvertex_ in self.gltf.nodes
             # }
             import json
             with open(self.file_path_name, "r") as file:
                 self.d_gltf_json = json.load(file)
-            self.d_glnode_info = {
-                glnode_["mesh"]: glnode_["name"] 
-                for glnode_ in self.d_gltf_json["nodes"]
+            self.d_glpvertex_info = {
+                glpvertex_["mesh"]: glpvertex_["name"] 
+                for glpvertex_ in self.d_gltf_json["nodes"]
             }
-            self.d_glvertex_glnode = {
-                glvertex_: glnode_
-                for glnode_, glvertex_ in list(self.get_glvertices())
+            self.d_glvpoint_glpvertex = {
+                glvpoints_: glpvertex_
+                for glpvertex_, glvpoints_ in list(self.get_glpvertices_glvpoints())
             }
         else:
             self.gltf = None
             self.d_gltf_json = None
-            self.d_glnode_info = None
+            self.d_glpvertex_info = None
 
-    def get_glvertices(self):
+    def get_glpvertices_glvpoints(self):
         import struct
         gltf = self.gltf
-        for glnode_ in gltf.scenes[gltf.scene].nodes:
+        for glpvertex_ in gltf.scenes[gltf.scene].nodes:
             # get the vertices for each primitive in the mesh 
-            for primitive_ in gltf.meshes[glnode_].primitives:
-                print(primitive_)
+            for primitive_ in gltf.meshes[glpvertex_].primitives:
+                print(f"glTF primitive: {glpvertex_}")
                 # get the binary data for this mesh primitive from the buffer
                 accessor = gltf.accessors[primitive_.attributes.POSITION]
                 buffer_view = gltf.bufferViews[accessor.bufferView]
@@ -155,7 +155,7 @@ class Mesh:
                     d = data[index:index+12]
                     # convert from base64 to three floats
                     v = struct.unpack("<fff", d)
-                    yield(glnode_, tuple(np.round(np.array(v),6)))
+                    yield(glpvertex_, tuple(np.round(np.array(v),6)))
  
     # def parse(self) -> None:
     #     self.member_info: Dict = {

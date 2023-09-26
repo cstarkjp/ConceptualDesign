@@ -47,7 +47,7 @@ class Topology:
             immutable set of communities that are actually applied loads
         d_appliedload_communities (dict):
             applied-force-indexed dictionary of communities that are actually applied loads
-        d_appliedload_trivertices (dict):
+        d_appliedload_vertices (dict):
             applied-force-indexed dictionary of triangles representing applied loads
         d_member_vertices (dict):
             member-indexed dictionary of vertices in each member
@@ -122,7 +122,7 @@ class Topology:
             appliedload_: community_ 
             for appliedload_,community_ in enumerate(self.appliedload_communities)
         }
-        self.d_appliedload_trivertices: Dict = {
+        self.d_appliedload_vertices: Dict = {
             appliedload_: self.communities.d_community_vertices[community_] 
             for appliedload_,community_ in self.d_appliedload_communities.items()
         }
@@ -212,7 +212,7 @@ class Topology:
         """
         self.d_member_nodes: Dict = {
             member_: frozenset(
-                vertices_.intersection(self.nodes)
+                frozenset(vertices_).intersection(self.nodes)
             )
             for member_, vertices_ in self.d_member_vertices.items()
         }
