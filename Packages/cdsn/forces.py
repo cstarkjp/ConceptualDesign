@@ -44,6 +44,7 @@ class Forces:
         self.topology = topology 
         self.compute_appliedloads_forcevectors()
         self.find_appliedloads_triangles()
+        self.parse_appliedload_forces()
 
     def compute_force_vector(
             self,
@@ -100,4 +101,18 @@ class Forces:
         self.d_triangle_appliedload: Dict = {
             triangle_: appliedload_
             for appliedload_,triangle_ in self.d_appliedload_triangle.items()
+        }
+
+    def parse_appliedload_forces(self) -> None:
+        topology = self.topology
+        communities = topology.communities
+        self.d_appliedload_forcenewtons: Dict[int,float] = {
+            appliedload_: float(
+                                communities.d_community_info[community_]
+                                .replace("Force ","")
+                                .replace(" ","")
+                                .replace("N","")
+                                .replace("k","e3")
+                            )
+            for appliedload_, community_ in topology.d_appliedload_communities.items()
         }

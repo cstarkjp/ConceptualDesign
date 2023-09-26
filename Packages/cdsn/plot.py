@@ -284,9 +284,11 @@ class Visualization:
             # Step through all the triangles, but label only those that correspond
             #   to an applied load
             appliedload_labels = [
-                (f"{forces.d_triangle_appliedload[triangle_]}" 
-                if triangle_ in forces.d_triangle_appliedload
-                else "")
+                (
+                    (f"{forces.d_appliedload_forcenewtons[forces.d_triangle_appliedload[triangle_]]/1000} kN")
+                    if triangle_ in forces.d_triangle_appliedload
+                    else ""
+                )
                 for triangle_ in graph.d_triangle_trivertices
             ]
             p.add_point_labels(

@@ -123,7 +123,7 @@ class Topology:
             for appliedload_,community_ in enumerate(self.appliedload_communities)
         }
         self.d_appliedload_vertices: Dict = {
-            appliedload_: self.communities.d_community_vertices[community_] 
+            appliedload_: frozenset(self.communities.d_community_vertices[community_])
             for appliedload_,community_ in self.d_appliedload_communities.items()
         }
         d_community_vertices_: Dict = self.communities.d_community_vertices.copy()
