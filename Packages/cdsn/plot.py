@@ -279,13 +279,15 @@ class Visualization:
                 pvmesh.cell_centers(), 
                 triangle_labels, 
                 font_size=font_size,
+                text_color='w',
+                point_color="k",
             )
         if do_appliedload_labels:
             # Step through all the triangles, but label only those that correspond
             #   to an applied load
             appliedload_labels = [
                 (
-                    (f"{forces.d_appliedload_forcenewtons[forces.d_triangle_appliedload[triangle_]]/1000} kN")
+                    (f"{forces.d_appliedload_forcenewtons[forces.d_triangle_appliedload[triangle_]]/1000:.0f} kN")
                     if triangle_ in forces.d_triangle_appliedload
                     else ""
                 )
@@ -295,6 +297,11 @@ class Visualization:
                 pvmesh.cell_centers(), 
                 appliedload_labels, 
                 font_size=font_size,
+                font_family="arial",
+                text_color='k',
+                point_color="k",
+                shape_color="w",
+                show_points=False,
             )
         p.camera_position = "xy"
         p.show(jupyter_backend=backend)
