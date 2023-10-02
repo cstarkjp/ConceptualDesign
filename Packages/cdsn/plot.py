@@ -258,7 +258,7 @@ class Visualization:
             do_triangle_labels: Optional[bool] = False,
             do_appliedload_labels: Optional[bool] = False,
             backend: Optional[str] = "trame",
-            font_size: Optional[int] = 10,
+            font_size: Optional[int] = 11,
         ) -> PVPlotter:
         p = pv.Plotter(notebook="true",)
         _ = p.add_mesh(
@@ -279,8 +279,6 @@ class Visualization:
                 pvmesh.cell_centers(), 
                 triangle_labels, 
                 font_size=font_size,
-                text_color='w',
-                point_color="k",
             )
         if do_appliedload_labels:
             # Step through all the triangles, but label only those that correspond
@@ -298,9 +296,12 @@ class Visualization:
                 appliedload_labels, 
                 font_size=font_size,
                 font_family="arial",
+                bold=False,
                 text_color='k',
                 point_color="k",
                 shape_color="w",
+                shape="rounded_rect",
+                shape_opacity=0.5,
                 show_points=False,
             )
         p.camera_position = "xy"

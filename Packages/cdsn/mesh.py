@@ -110,14 +110,11 @@ class Mesh:
         # If this is a glTF and we have metadata available:
         self.gltf: Optional[Dict] = None
         self.d_gltf_json: Optional[Dict] = None
-        self.d_glpvertex_info: Optional[Dict] = None
+        self.d_glpvertex_info: Optional[Dict[int,str]] = None
+        self.d_glvpoint_glpvertex: Optional[Dict[tuple,int]] = None
         if self.file_type=="gltf":
             from pygltflib import GLTF2
             self.gltf = GLTF2().load(self.file_path_name)
-            # self.d_glpvertex_info: Dict = {
-            #     glpvertex_.mesh: glpvertex_.name 
-            #     for glpvertex_ in self.gltf.nodes
-            # }
             import json
             with open(self.file_path_name, "r") as file:
                 self.d_gltf_json = json.load(file)
@@ -129,10 +126,6 @@ class Mesh:
                 glvpoints_: glpvertex_
                 for glpvertex_, glvpoints_ in list(self.get_glpvertices_glvpoints())
             }
-        else:
-            self.gltf = None
-            self.d_gltf_json = None
-            self.d_glpvertex_info = None
 
     def get_glpvertices_glvpoints(self):
         import struct

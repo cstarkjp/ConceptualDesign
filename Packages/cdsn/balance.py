@@ -15,6 +15,8 @@ from typing import (
     Dict, Any, Tuple, Optional, List, Callable, Iterable, Sized, Generator,
 )
 
+import time
+
 import numpy as np
 from sympy import (
     Eq, Symbol, MatrixSymbol, MatAdd, Matrix, Rational, Integer,
