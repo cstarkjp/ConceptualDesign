@@ -194,6 +194,11 @@ def main(args):
                 line = file.readline()
                 continue
 
+            # HACK to fix weird markdown -> latex error for big matrix eqn
+            if re.search("textbackslash", line):
+                print("\end{equation}")
+                continue
+
             # Print the line
             print(line, end="", flush=True)
                  
