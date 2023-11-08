@@ -29,8 +29,7 @@ dependencies:
 
 
 ## Add environment variables to this conda env:
-# conda env config vars set PYTHONPATH="${HOME}/miniconda3/envs/DrumFlow/lib/python3.11/site-packages:${HOME}/Teaching/ConceptualDesign/Packages"
-
+# conda env config vars set PYTHONPATH="${HOME}/miniconda3/envs/Conceptual/lib/python3.10/site-packages:${HOME}/Teaching/ConceptualDesign/Packages"
 ## List them using:
 # conda env config vars list
 
