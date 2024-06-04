@@ -6,7 +6,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python==3.9
+  - python=3.11
   - jupyter
   - matplotlib
   - numpy
@@ -21,10 +21,11 @@ dependencies:
   - pycollada   # if you want trimesh to read Collada files
   - pyvista
   - pip
-  # - trame=3.5.0
+  - trame=3.5.0
   # - sympy_plot_backends[all]
-# pip install pygltflib   # alternative way of reading glTF files
 variables:
-  PYTHONPATH: /Users/cps/miniconda3/envs/ConceptualDesign/lib/python3.10/site-packages:/Users/cps/Projects/ConceptualDesign/Packages
+  PYTHONPATH: /Users/cps/miniconda3/envs/ConceptualDesign/lib/python3.11/site-packages:/Users/cps/Projects/ConceptualDesign/Packages
 prefix: /Users/cps/miniconda3/envs/ConceptualDesign
 
+# Not available from conda-forge apparently:
+#   pip install pygltflib==1.16.2    # alternative way of reading glTF files

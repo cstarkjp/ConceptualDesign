@@ -130,11 +130,11 @@ class Mesh:
     def get_glpvertices_glvpoints(self):
         import struct
         gltf = self.gltf
-        print(gltf)
+        # print(gltf)
         for glpvertex_ in gltf.scenes[gltf.scene].nodes:
             # get the vertices for each primitive in the mesh 
-            # for primitive_ in gltf.meshes[glpvertex_].primitives:
-                print(f"glTF primitive #{glpvertex_}:  {primitive_.attributes.POSITION}")
+            for primitive_ in gltf.meshes[glpvertex_].primitives:
+                # print(f"glTF primitive #{glpvertex_}:  {primitive_.attributes.POSITION}")
                 # get the binary data for this mesh primitive from the buffer
                 accessor = gltf.accessors[primitive_.attributes.POSITION]
                 # print(f"accessor: {accessor}")
