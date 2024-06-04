@@ -130,12 +130,18 @@ class Mesh:
     def get_glpvertices_glvpoints(self):
         import struct
         gltf = self.gltf
+        print(gltf)
         for glpvertex_ in gltf.scenes[gltf.scene].nodes:
             # get the vertices for each primitive in the mesh 
-            for primitive_ in gltf.meshes[glpvertex_].primitives:
-                print(f"glTF primitive: {glpvertex_}")
+            # for primitive_ in gltf.meshes[glpvertex_].primitives:
+                print(f"glTF primitive #{glpvertex_}:  {primitive_.attributes.POSITION}")
                 # get the binary data for this mesh primitive from the buffer
                 accessor = gltf.accessors[primitive_.attributes.POSITION]
+                # print(f"accessor: {accessor}")
+                bv = gltf.bufferViews[accessor.bufferView]
+                # print(dir(gltf))
+                # data = gltf._glb_data[bv.byteOffset : bv.byteOffset + bv.byteLength]
+                # triangles = np.frombuffer(data, dtype=np.uint16)
                 buffer_view = gltf.bufferViews[accessor.bufferView]
                 buffer = gltf.buffers[buffer_view.buffer]
                 data = gltf.get_data_from_buffer_uri(buffer.uri)

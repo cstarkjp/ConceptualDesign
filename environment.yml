@@ -1,21 +1,18 @@
 # This file may be used to create a Python/conda environment using conda itself or mamba (faster):
 #   mamba remove --name ConceptualDesign --all
 #   mamba env create --name ConceptualDesign --file environment.yml
-
 name: ConceptualDesign
-
 channels:
   - conda-forge
   - defaults
-
 dependencies:
-  - python==3.10
+  - python==3.9
   - jupyter
   - matplotlib
   - numpy
   - scipy
-  # - sympy
-  # - numpy-stl
+  - sympy
+  - numpy-stl
   - trimesh
   - networkx    # needed by trimesh but dependency not set
   - pyglet      # needed by trimesh but dependency not set
@@ -23,13 +20,11 @@ dependencies:
   - rtree       # needed by trimesh but dependency not set
   - pycollada   # if you want trimesh to read Collada files
   - pyvista
+  - pip
+  # - trame=3.5.0
   # - sympy_plot_backends[all]
-
 # pip install pygltflib   # alternative way of reading glTF files
-
-
-## Add environment variables to this conda env:
-# conda env config vars set PYTHONPATH="${HOME}/miniconda3/envs/Conceptual/lib/python3.10/site-packages:${HOME}/Teaching/ConceptualDesign/Packages"
-## List them using:
-# conda env config vars list
+variables:
+  PYTHONPATH: /Users/cps/miniconda3/envs/ConceptualDesign/lib/python3.10/site-packages:/Users/cps/Projects/ConceptualDesign/Packages
+prefix: /Users/cps/miniconda3/envs/ConceptualDesign
 
